@@ -1,0 +1,10 @@
+List of components to make
+
+ - ?? TextField (text entry for login mainly)
+ - Card (floating box on any page, versatile)
+ - Book (book info display block in a grid)
+ - Quiz Status Bar
+ - Quiz Answer Option
+ - Quiz Question Card
+ - Scrollbar
+ - Scrolling element
