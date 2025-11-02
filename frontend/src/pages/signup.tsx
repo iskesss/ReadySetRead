@@ -2,6 +2,12 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../logo.png';
 
+//Component imports
+import { Button } from "../components/button.tsx"
+
+//Style imports
+import '../styles/Signup.css'
+
 export default function CreateAccount() {
   const [signUpType, setSignUpType] = useState('student');
   const [id, setId] = useState('');
@@ -11,9 +17,9 @@ export default function CreateAccount() {
 
   function AfterSubmitClicked() {
     <Link to="/login">
-        <button type="button">
-            {signUpType === 'student' ? 'Sign in as Student' : 'Sign in as Parent'}
-        </button>
+      <button type="button" className='btn'>
+        {signUpType === 'student' ? 'Sign in as Student' : 'Sign in as Parent'}
+      </button>
     </Link>
     //CONNECT BACKEND HERE
   }
@@ -30,27 +36,22 @@ export default function CreateAccount() {
           <p className="subheader">Select your login type:</p>
 
           <div className="ParentOrStudentToggle">
-            <button
-              type="button"
-              onClick={() => {
-                setSignUpType('student');
-              }}
-            >
+            <Button onClick={() => {
+              setSignUpType('student');
+            }}>
               Student
-            </button>
+            </Button>
 
-            <button
-              type="button"
-              onClick={() => {
-                setSignUpType('parent');
-              }}
-            >
+            <Button onClick={() => {
+              setSignUpType('parent');
+            }}>
               Parent
-            </button>
+            </Button>
           </div>
 
           <form
             onSubmit={(e) => {
+              e.preventDefault();
               AfterSubmitClicked();
             }}
           >
@@ -69,9 +70,14 @@ export default function CreateAccount() {
               required
             />
 
-            <button type="submit">
+            <Button
+              type="submit"
+              onClick={() => {
+                setSignUpType('parent');
+              }
+              }>
               {signUpType === 'student' ? 'Sign in as Student' : 'Sign in as Parent'}
-            </button>
+            </Button>
           </form>
         </div>
       </main>
