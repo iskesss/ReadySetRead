@@ -74,4 +74,7 @@
   align-items: center;
 }
 
-/* BUTTON STYLES, app-wide */
+/* Text input styles */
+input {
+  margin: 2px;
+}

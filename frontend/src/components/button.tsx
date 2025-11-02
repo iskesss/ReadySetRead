@@ -1,5 +1,7 @@
 import React, { forwardRef } from 'react'
 
+import "../styles/Button.css"
+
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     loading?: boolean;
 };

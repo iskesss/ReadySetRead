@@ -2,79 +2,84 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../logo.png';
 
-export default function loginAccount() {
-  const [signUpType, setSignUpType] = useState('student');
-  const [id, setId] = useState('');
-  const [password, setPassword] = useState('');
+// Component imports
+import { Button } from "../components/button"
 
-  const idPlaceholder = signUpType === 'student' ? 'Username' : 'Email';
+// Style imports
+import '../styles/Login.css'
 
-  function AfterCreateAccountClicked() {
-    <Link to="/signup">
-        <button type="button">
-            {signUpType === 'student' ? 'Sign in as Student' : 'Sign in as Parent'}
-        </button>
-    </Link>
-    //CONNECT BACKEND HERE
-  }
 
-  return (
-    <div className="page-background">
-      <div className="logo-container">
-        <img src={logo} className="logo" alt="Logo" />
-      </div>
+export default function LoginAccount() {
+    const [loginType, setLoginType] = useState('student');
+    const [id, setId] = useState('');
+    const [password, setPassword] = useState('');
 
-      <main>
-        <div className="card">
-          <h1 className="header">Sign In</h1>
-          <p className="subheader">Select your login type:</p>
+    const idPlaceholder = loginType === 'student' ? 'Username' : 'Email';
 
-          <div className="ParentOrStudentToggle">
-            <button
-              type="button"
-              onClick={() => {
-                setSignUpType('student');
-              }}
-            >
-              Student
-            </button>
+    function AfterCreateAccountClicked() {
+        <Link to="/signup">
+            <Button>
+                {loginType === 'student' ? 'Sign in as Student' : 'Sign in as Parent'}
+            </Button>
+        </Link>
+    }
 
-            <button
-              type="button"
-              onClick={() => {
-                setSignUpType('parent');
-              }}
-            >
-              Parent
-            </button>
-          </div>
+    return (
+        <div className="page-background">
+            <div className="logo-container">
+                <img src={logo} className="logo" alt="Logo" />
+            </div>
 
-          <form
-            onSubmit={(e) => {
-              AfterCreateAccountClicked();
-            }}
-          >
-            <input
-              value={id}
-              onChange={(e) => setId(e.target.value)}
-              placeholder={idPlaceholder}
-              required
-            />
+            <main>
+                <div className="card">
+                    <h1 className="header">Sign In</h1>
+                    <p className="subheader">Select your login type:</p>
 
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="password"
-              required
-            />
+                    <div className="ParentOrStudentToggle">
+                        <Button onClick={() => {
+                            setLoginType('student');
+                        }}>
+                            Student
+                        </Button>
 
-            <button type="submit">
-              {signUpType === 'student' ? 'Sign in as Student' : 'Sign in as Parent'}
-            </button>
-          </form>
+                        <Button onClick={() => {
+                            setLoginType('parent');
+                        }}>
+                            Parent
+                        </Button>
+                    </div>
+
+                    <form
+                        onSubmit={() => {
+                            AfterCreateAccountClicked();
+                        }}
+                    >
+                        <input
+                            value={id}
+                            onChange={(e) => setId(e.target.value)}
+                            placeholder={idPlaceholder}
+                            required
+                        />
+
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="password"
+                            required
+                        />
+
+                        <Button>
+                            {loginType === 'student' ? 'Sign in as Student' : 'Sign in as Parent'}
+                        </Button>
+                        <Link to="/signup">
+                            <Button type="button">
+                                Create account instead
+                            </Button>
+                        </Link>
+                    </form>
+                </div>
+            </main>
         </div>
-      </main>
-    </div>
-  );
+    );
 }

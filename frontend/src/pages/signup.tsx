@@ -21,7 +21,6 @@ export default function CreateAccount() {
         {signUpType === 'student' ? 'Sign in as Student' : 'Sign in as Parent'}
       </button>
     </Link>
-    //CONNECT BACKEND HERE
   }
 
   return (
@@ -76,8 +75,13 @@ export default function CreateAccount() {
                 setSignUpType('parent');
               }
               }>
-              {signUpType === 'student' ? 'Sign in as Student' : 'Sign in as Parent'}
+              {signUpType === 'student' ? 'Create a Student Account' : 'Create a Parent Account'}
             </Button>
+            <Link to="/">
+              <Button type="button">
+                Log In instead
+              </Button>
+            </Link>
           </form>
         </div>
       </main>

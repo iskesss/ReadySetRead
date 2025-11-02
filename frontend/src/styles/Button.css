@@ -1,0 +1,7 @@
+.btn {
+    margin: 3px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: var(--spaceCadet);
+    color: white;
+}
