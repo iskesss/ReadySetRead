@@ -8,7 +8,6 @@ import { Button } from "../components/button"
 // Style imports
 import '../styles/Login.css'
 
-
 export default function LoginAccount() {
     const [loginType, setLoginType] = useState('student');
     const [id, setId] = useState('');
@@ -65,7 +64,7 @@ export default function LoginAccount() {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="password"
+                            placeholder="Password"
                             required
                         />
 
@@ -74,7 +73,7 @@ export default function LoginAccount() {
                         </Button>
                         <Link to="/signup">
                             <Button type="button">
-                                Create account instead
+                                Create Account Instead
                             </Button>
                         </Link>
                     </form>

@@ -7,6 +7,7 @@ import { Button } from "../components/button.tsx"
 
 //Style imports
 import '../styles/Signup.css'
+import '../styles/App.css'
 
 export default function CreateAccount() {
   const [signUpType, setSignUpType] = useState('student');
@@ -65,7 +66,7 @@ export default function CreateAccount() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="password"
+              placeholder="Password"
               required
             />
 
