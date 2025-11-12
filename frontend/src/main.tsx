@@ -6,6 +6,7 @@ import './styles/App.css'
 
 import SignUpPage from './pages/signup.tsx'
 import LoginPage from './pages/login.tsx'
+import LibraryPage from './pages/library.tsx'
 
 
 
@@ -15,6 +16,7 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/library" element={<LibraryPage />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

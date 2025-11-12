@@ -1,0 +1,24 @@
+/* The grid holding library book cards */
+.libraryGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+    justify-items: stretch;
+    width: 100%;
+}
+
+
+/* An individual book card */
+.libraryBookCard {
+    padding: 1.5rem;
+    margin: 0;
+    border: 1px solid gray;
+    border-radius: 8px;
+    background-color: var(--salmon);
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    text-align: left;
+    height: fit-content;
+}

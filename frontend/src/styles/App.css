@@ -8,12 +8,27 @@
   --salmon: lightsalmon;
 
   /* This will be main app background color */
-  /* background-color: var(--celadon); */
+  background-color: white;
 
   max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
   text-align: center;
+  height: 100%;
+}
+
+/* MAIN PAGE SIZING STYLES */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.page-background {
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* LOGO STYLES, app-wide */
@@ -62,10 +77,6 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-}
-
-.page-background {
-  color: white
 }
 
 .logo-container {
