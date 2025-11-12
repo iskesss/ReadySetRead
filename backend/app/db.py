@@ -1,16 +1,28 @@
+# app/db.py
 import os
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase
+from psycopg_pool import AsyncConnectionPool
 
-# TODO: backend team make sure to set this up later in AWS app runner / docker compose
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    # fallback lets you start the app even without a database :)
-    "postgresql+psycopg://postgres:postgres@localhost:5432/postgres",
-)
+DATABASE_URL = os.getenv("DATABASE_URL")
+SCHEMA = os.getenv("DB_SCHEMA", "prod_schema")
+ADULTS_TABLE = f"{SCHEMA}.adults"
+CHILDREN_TABLE = f"{SCHEMA}.children"
+BOOKS_TABLE = f"{SCHEMA}.books"
+QUIZZES_TABLE = f"{SCHEMA}.quizzes"
 
-engine = create_async_engine(DATABASE_URL, echo=False)
-SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+pool: AsyncConnectionPool | None = None
 
-class Base(DeclarativeBase):
-    pass
+async def init_pool_and_db():
+    global pool
+    if not DATABASE_URL:
+        raise RuntimeError("The DATABASE_URL is not set")
+    pool = AsyncConnectionPool(DATABASE_URL, min_size=1, max_size=10)
+    try:
+        await pool.open()
+    except Exception as exc:
+        raise RuntimeError(f"The DB isn't reachable: {exc}") from exc # if you're running the uvicorn server locally, pls make sure your dev computer's IP address is whitelisted by AWS RDS
+
+async def close_pool():
+    global pool
+    if pool:
+        await pool.close()
+        pool =None
