@@ -83,6 +83,14 @@ export default function CreateAccount() {
                 Log In instead
               </Button>
             </Link>
+
+            {/* TEMMPORARY BUTTON TO NAVIGATE AND TEST LIBRARY PAGE */}
+            <Link to="/library">
+              <Button>
+                Library
+              </Button>
+            </Link>
+
           </form>
         </div>
       </main>

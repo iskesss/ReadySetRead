@@ -1,0 +1,23 @@
+.page-background {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 1rem;
+}
+
+/* The grid holding library book cards */
+.libraryGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    align-items: start;
+    justify-items: stretch;
+    width: 100%;
+    overflow-y: auto;
+    padding: 1rem 0;
+}
