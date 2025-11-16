@@ -1,6 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../logo.png';
+
+//API imports
+import { loginParent } from '../api/parents';
+import { loginStudent } from '../api/students';
 
 // Component imports
 import { Button } from "../components/button"
@@ -12,15 +16,39 @@ export default function LoginAccount() {
     const [loginType, setLoginType] = useState('student');
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
+    const navigate = useNavigate();
     const idPlaceholder = loginType === 'student' ? 'Username' : 'Email';
 
-    function AfterCreateAccountClicked() {
-        <Link to="/signup">
-            <Button>
-                {loginType === 'student' ? 'Sign in as Student' : 'Sign in as Parent'}
-            </Button>
-        </Link>
+    async function AfterSubmitClicked() {
+        setError('');
+        setLoading(true);
+
+        try {
+            if (loginType === 'student') {
+                await loginStudent({
+                    child_name: id,
+                    password
+                });
+
+                navigate('/studentLanding');
+            }
+            else {
+                // Parent login
+                await loginParent({
+                    adult_email: id,
+                    password,
+                });
+
+                navigate('/parentLanding');
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
@@ -33,6 +61,8 @@ export default function LoginAccount() {
                 <div className="card">
                     <h1 className="header">Sign In</h1>
                     <p className="subheader">Select your login type:</p>
+
+                    {error && <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>}
 
                     <div className="ParentOrStudentToggle">
                         <Button onClick={() => {
@@ -49,8 +79,9 @@ export default function LoginAccount() {
                     </div>
 
                     <form
-                        onSubmit={() => {
-                            AfterCreateAccountClicked();
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            AfterSubmitClicked();
                         }}
                     >
                         <input
@@ -67,9 +98,10 @@ export default function LoginAccount() {
                             placeholder="Password"
                             required
                         />
-
-                        <Button>
-                            {loginType === 'student' ? 'Sign in as Student' : 'Sign in as Parent'}
+                        <Button type="submit" disabled={loading}>
+                            {loading
+                                ? 'Logging in...'
+                                : loginType === 'student' ? 'Login as student' : 'Login as Parent'}
                         </Button>
                         <Link to="/signup">
                             <Button type="button">

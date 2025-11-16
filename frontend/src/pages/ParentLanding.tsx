@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import logo from '../logo.png';
+// import logo from '../logo.png';
 
 //Component imports
 import { Button } from '../components/button';
@@ -17,36 +17,41 @@ function Greeting({ parentName }: { parentName: string }) {
 export default function ParentLandingPage() {
 
   return (
-    
-    
+
+
     //CONNECT TO BACKEND:CHILDREN NAME(S) & # cards displayed (edge case to add child?)
     //must also add links to each specific child's progress page
-    
-    <div className='parentLandingContainer'> 
-        
-        <div className='header'>
-            <Link to="/"><button className="btn logoutBtn">Log out</button></Link>
-            
-            <Greeting parentName = "Mimi"/>
-        </div>
 
-        <div className ="card studentCard">
-            <div className='childName'> Lilly </div>
-            <Button className=' btn viewProgress'> View Progress </Button>  
-        </div>
+    <div className='parentLandingContainer'>
+
+      <div className='header'>
+        <Link to="/">
+          <Button className="btn logoutBtn">
+            Log out
+          </Button>
+        </Link>
+
+        <Greeting parentName="Mimi" />
+        <p>{localStorage.getItem('token')}</p>
+      </div>
+
+      <div className="card studentCard">
+        <div className='childName'> Lilly </div>
+        <Button className=' btn viewProgress'> View Progress </Button>
+      </div>
 
 
-        <div className ="card studentCard">
-            <div className='childName'> Abraham </div>
-            <Button className=' btn viewProgress'> View Progress </Button>  
-        </div>
+      <div className="card studentCard">
+        <div className='childName'> Abraham </div>
+        <Button className=' btn viewProgress'> View Progress </Button>
+      </div>
 
 
-        <div className ="card studentCard">
-            <div className='childName'> Kit </div>
-            <Button className='btn viewProgress'> View Progress </Button>  
-        </div>
-    
+      <div className="card studentCard">
+        <div className='childName'> Kit </div>
+        <Button className='btn viewProgress'> View Progress </Button>
+      </div>
+
 
     </div>
   );
