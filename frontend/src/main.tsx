@@ -13,6 +13,9 @@ import QuizPage from './pages/Quiz.tsx'
 // Placeholder
 import PHStudentLandingPage from './pages/PlaceholderStudentLanding.tsx';
 
+=======
+import ParentProgress from './pages/ParentProgress.tsx'
+>>>>>>> d8bbb672c518a88b13c58b63c1fedfd09db797cb
 
 
 createRoot(document.getElementById('root')!).render(
@@ -23,8 +26,12 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/parentLanding" element={<ParentLanding />} />
         <Route path="/library" element={<LibraryPage />} />
+<<<<<<< HEAD
         <Route path="/studentLanding" element={<PHStudentLandingPage />} />
         <Route path="/quiz" element={<QuizPage />} />
+=======
+        <Route path="/ParentProgress" element={<ParentProgress />} />
+>>>>>>> d8bbb672c518a88b13c58b63c1fedfd09db797cb
       </Routes>
     </BrowserRouter>
   </StrictMode>,
