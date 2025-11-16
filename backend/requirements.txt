@@ -12,6 +12,7 @@ fastapi==0.120.4
 h11==0.16.0
 httptools==0.7.1
 idna==3.11
+openai>=1.0.0
 passlib==1.7.4
 psycopg==3.2.12
 psycopg-binary==3.2.12

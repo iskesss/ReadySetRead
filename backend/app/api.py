@@ -1,12 +1,14 @@
 # app/api.py
 import os, time
 from typing import Literal
+import asyncio
 from fastapi import APIRouter, HTTPException, Depends, status, Request
 from pydantic import BaseModel, EmailStr, Field
 from jose import jwt, JWTError
 import bcrypt
 from psycopg.rows import dict_row
 from . import db
+from .quiz_llm import generate_quiz_for_book, QuizQuestionDict
 
 ADULTS_TABLE = db.ADULTS_TABLE
 CHILDREN_TABLE = db.CHILDREN_TABLE
@@ -46,6 +48,43 @@ class ChildLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+# OPENAI QUIZ GENERATION
+# —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_  
+
+class QuizQuestion(BaseModel):
+    id: str
+    type: str = "multiple_choice"
+    question: str
+    options: list[str]
+    correct_answer: str
+    explanation: str | None = None
+
+
+class GenerateQuizRequest(BaseModel):
+    book_title: str = Field(
+        description="Title of the book to generate a quiz for.",
+    )
+    author: str | None = Field(
+        default=None,
+        description="Optional author name to disambiguate editions/books.",
+    )
+    reading_level: str | None = Field(
+        default=None,
+        description="Optional reading level, e.g. '3rd grade'",
+    )
+    num_questions: int = Field(
+        default=10,
+        ge=1,
+        le=20,
+        description="Target number of quiz questions.",
+    )
+
+
+class GenerateQuizResponse(BaseModel):
+    questions: list[QuizQuestion]
+
+
+
 
 # JWT AUTHENTICATION HELPER FUNCTIONS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
@@ -272,3 +311,24 @@ async def child_login(payload: ChildLogin):
 @router.get("/child/me", response_model=ChildOut)
 async def child_me(current: ChildOut = Depends(get_current_child)):
     return current
+
+# QUIZ GENERATION (LLM)
+# —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
+
+@router.post("/quiz/generate", response_model=GenerateQuizResponse)
+def generate_quiz_endpoint(
+    payload: GenerateQuizRequest,
+    #current_child: ChildOut = Depends(get_current_child),
+):
+    questions_dicts = generate_quiz_for_book(
+        book_title=payload.book_title,
+        author=payload.author,
+        reading_level=payload.reading_level,
+        num_questions=payload.num_questions,
+    )
+
+   
+    questions = [QuizQuestion(**q) for q in questions_dicts] # converts raw dicts into pydantic models
+
+
+    return GenerateQuizResponse(questions=questions)        # wrap them in the response model
