@@ -8,7 +8,7 @@ import SignUpPage from './pages/signup.tsx'
 import LoginPage from './pages/login.tsx'
 import ParentLanding from './pages/ParentLanding.tsx'
 import LibraryPage from './pages/library.tsx'
-
+import ParentProgress from './pages/ParentProgress.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
@@ -18,7 +18,9 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/parentLanding" element={<ParentLanding />} />
+        <Route path="/parentLanding" element={<ParentLanding />} />
         <Route path="/library" element={<LibraryPage />} />
+        <Route path="/ParentProgress" element={<ParentProgress />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
