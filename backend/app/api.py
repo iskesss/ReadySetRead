@@ -190,6 +190,34 @@ async def adult_login(payload: AdultLogin):
 async def adult_me(current: AdultOut = Depends(get_current_adult)):
     return current
 
+@router.get("/adult/{adult_email}/children", response_model=list[ChildOut])
+async def list_children_for_adult(adult_email: EmailStr, current: AdultOut = Depends(get_current_adult)): # second parameter is meant to let the endpoint know which adult is currently logged in, so it can ensure that parents can only access their own children's data
+    if current.adult_email != adult_email:
+        raise HTTPException(status_code=403, detail="Hey, these ain't your kids!")
+
+    pool = require_pool()
+    async with pool.connection() as db_connection:
+        db_connection.row_factory = dict_row
+        async with db_connection.cursor() as db_cursor:
+            await db_cursor.execute( # just in case the adult account got deleted AFTER their login token was issued
+                f"SELECT * FROM {ADULTS_TABLE} WHERE adult_email = %s LIMIT 1",
+                (adult_email,)
+            )
+            if not await db_cursor.fetchone():
+                raise HTTPException(status_code=404, detail="Adult account was not found")
+
+            await db_cursor.execute(
+                f"""
+                SELECT child_id, child_name, num_coins, adult_email
+                FROM {CHILDREN_TABLE}
+                WHERE adult_email = %s
+                ORDER BY child_name
+                """,
+                (adult_email,)
+            )
+            rows = await db_cursor.fetchall()
+            return [ChildOut(**row) for row in rows] # return a list of child JSON objects
+
 # CHILD-SPECIFIC FUNCTIONS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
 @router.post("/child/auth/signup", response_model=ChildOut, status_code=201)
