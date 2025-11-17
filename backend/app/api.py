@@ -48,9 +48,9 @@ class ChildLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
 # OPENAI QUIZ GENERATION
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_  
-
 class QuizQuestion(BaseModel):
     id: str
     type: str = "multiple_choice"
@@ -79,12 +79,8 @@ class GenerateQuizRequest(BaseModel):
         description="Target number of quiz questions.",
     )
 
-
 class GenerateQuizResponse(BaseModel):
     questions: list[QuizQuestion]
-
-
-
 
 # JWT AUTHENTICATION HELPER FUNCTIONS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
@@ -318,7 +314,7 @@ async def child_me(current: ChildOut = Depends(get_current_child)):
 @router.post("/quiz/generate", response_model=GenerateQuizResponse)
 def generate_quiz_endpoint(
     payload: GenerateQuizRequest,
-    #current_child: ChildOut = Depends(get_current_child),
+    current_child: ChildOut = Depends(get_current_child),
 ):
     questions_dicts = generate_quiz_for_book(
         book_title=payload.book_title,
@@ -327,8 +323,6 @@ def generate_quiz_endpoint(
         num_questions=payload.num_questions,
     )
 
-   
     questions = [QuizQuestion(**q) for q in questions_dicts] # converts raw dicts into pydantic models
-
 
     return GenerateQuizResponse(questions=questions)        # wrap them in the response model
