@@ -62,7 +62,7 @@ export default function ParentProgress() {
             </div>
           </div>
 
-          {/* Adding goals or assigning books feature -- LINK TO OTHER PGs HERE */}
+          {/* Adding goals or assigning books feature -- LINK TO OTHER pages HERE */}
           <div className="goalButtons">
             <Button>Add goal</Button>
             <Button>Assign a book</Button>

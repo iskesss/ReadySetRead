@@ -9,6 +9,7 @@ import LoginPage from './pages/login.tsx'
 import ParentLanding from './pages/ParentLanding.tsx'
 import LibraryPage from './pages/library.tsx'
 import QuizPage from './pages/Quiz.tsx'
+import Rewards from './pages/Rewards.tsx'
 
 // Placeholder
 import PHStudentLandingPage from './pages/PlaceholderStudentLanding.tsx';
@@ -27,6 +28,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/studentLanding" element={<PHStudentLandingPage />} />
         <Route path="/quiz" element={<QuizPage />} />
         <Route path="/ParentProgress" element={<ParentProgress />} />
+        <Route path="/Rewards" element={<Rewards />} />
       </Routes >
     </BrowserRouter >
   </StrictMode >,

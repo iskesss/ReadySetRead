@@ -1,0 +1,48 @@
+
+.rewardsContainer {
+    position: relative;  
+    width: 100%;
+    padding: 24px;
+}
+
+
+.logoutBtn {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    font-size: 18px;
+}
+
+.topRow, .bottomRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+
+
+.rectangleCard{
+    flex: 1;
+}
+
+.squareCard{
+    height: 200px;
+    justify-content: center;
+}
+
+.customIncentiveBox{
+    background: var(--spaceCadet);
+}
+
+.circleBackground{
+    background: var(--spaceCadet);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 20px;
+    color: white;
+}
+
+.changeSkinBox{
+    background: var(--spaceCadet);
+}
