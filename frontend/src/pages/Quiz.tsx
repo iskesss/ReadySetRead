@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 // import logo from '../logo.png';
 
 //Component imports
@@ -8,8 +9,48 @@ import { Button } from '../components/button';
 import '../styles/App.css'
 import '../styles/Quiz.css'
 
+// API imports
+import type { QuizResponse } from '../api/types';
+
 
 export default function Quiz() {
+
+    const location = useLocation();
+    const { quizData } = location.state as { quizData: QuizResponse };
+    const navigate = useNavigate();
+
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    // const [userAnswers, setUserAnswers] = useState<string[]>([]);
+    const [showResults, setShowResults] = useState(false);
+    const [score, setScore] = useState(0);
+
+    const currentQuestion = quizData.questions[currentQuestionIndex];
+    const isLastQuestion = currentQuestionIndex === quizData.questions.length - 1
+
+    const handleAnswerClick = (selectedOption: string) => {
+        if (selectedOption == quizData.questions[currentQuestionIndex].correct_answer) {
+            setScore(score + 1);
+            setCurrentQuestionIndex(currentQuestionIndex + 1);
+        }
+        else {
+            setShowResults(true);
+        }
+        // const newAnswers = [...userAnswers, selectedOption];
+
+        if (isLastQuestion) {
+            navigate('/quizResults', {
+                state: {
+                    quizData: quizData,
+                    score: score
+                }
+            })
+        }
+    }
+
+    const handleNextClicked = () => {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        setShowResults(false)
+    }
 
     return (
         <div className='page-background'>
@@ -19,17 +60,30 @@ export default function Quiz() {
                 </Button>
             </Link>
             <div className='card quiz-question-box'>
-                <h1>Question 1</h1>
-                <p> How many bears were there in the Goldilocks book?</p>
+                <h1>Question {currentQuestionIndex + 1} of {quizData.questions.length}</h1>
+                {!showResults &&
+                    <p>{currentQuestion.question}</p>
+                }
+                {showResults &&
+                    <p>{currentQuestion.explanation}</p>
+                }
             </div>
             <div className='answer-container'>
-                <Button>Option 1</Button>
-                <Button>Option 2</Button>
-                <Button>Option 3</Button>
-                <Button>Option 4</Button>
+                {!showResults && currentQuestion.options.map((option, index) => (
+                    <Button
+                        key={index}
+                        onClick={() => handleAnswerClick(option)}
+                    >
+                        {option}
+                    </Button>
+                ))}
+                {showResults &&
+                    <Button onClick={() => handleNextClicked()}>
+                        Next Question
+                    </Button>
+
+                }
             </div>
-            <main>
-            </main>
         </div>
     )
 }

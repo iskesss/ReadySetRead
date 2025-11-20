@@ -21,6 +21,13 @@ export interface StudentLoginRequest {
   password: string;
 }
 
+export interface GenerateQuizRequest {
+  book_title: string;
+  author: string;
+  reading_level: string;
+  num_questions: number;
+}
+
 // API Response Types
 export interface ParentResponse {
   adult_email: string;
@@ -37,6 +44,19 @@ export interface StudentResponse {
 export interface TokenResponse {
   access_token: string;
   token_type: string;
+}
+
+export interface QuizQuestion {
+  id: string;
+  type: string;
+  question: string;
+  options: string[];
+  correct_answer: string;
+  explanation: string;
+}
+
+export interface QuizResponse {
+  questions: QuizQuestion[]
 }
 
 // Error Response Type
