@@ -13,12 +13,14 @@ import Rewards from './pages/Rewards.tsx'
 
 // Placeholder
 import PHStudentLandingPage from './pages/PlaceholderStudentLanding.tsx';
+import { StudentBooksProvider } from './components/StudentBooksContext.tsx';
 
 import ParentProgress from './pages/ParentProgress.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <StudentBooksProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
@@ -31,5 +33,6 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/Rewards" element={<Rewards />} />
       </Routes >
     </BrowserRouter >
+    </StudentBooksProvider>
   </StrictMode >,
 )
