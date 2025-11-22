@@ -1,5 +1,6 @@
 import {Button} from '../components/button';
 import '../styles/library.css'
+
 type Props = {
     title: string;
     status: 'passed' | 'incomplete';
