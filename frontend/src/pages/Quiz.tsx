@@ -54,35 +54,38 @@ export default function Quiz() {
 
     return (
         <div className='page-background'>
-            <Link to="/studentLanding">
-                <Button>
-                    Quit
-                </Button>
-            </Link>
-            <div className='card quiz-question-box'>
-                <h1>Question {currentQuestionIndex + 1} of {quizData.questions.length}</h1>
-                {!showResults &&
-                    <p>{currentQuestion.question}</p>
-                }
-                {showResults &&
-                    <p>{currentQuestion.explanation}</p>
-                }
-            </div>
-            <div className='answer-container'>
-                {!showResults && currentQuestion.options.map((option, index) => (
-                    <Button
-                        key={index}
-                        onClick={() => handleAnswerClick(option)}
-                    >
-                        {option}
-                    </Button>
-                ))}
-                {showResults &&
-                    <Button onClick={() => handleNextClicked()}>
-                        Next Question
-                    </Button>
+            <div className='layout-box'>
 
-                }
+                <Link to="/studentLanding">
+                    <Button>
+                        Quit
+                    </Button>
+                </Link>
+                <div className='card quiz-question-box'>
+                    <h1>Question {currentQuestionIndex + 1} of {quizData.questions.length}</h1>
+                    {!showResults &&
+                        <p>{currentQuestion.question}</p>
+                    }
+                    {showResults &&
+                        <p>{currentQuestion.explanation}</p>
+                    }
+                </div>
+                <div className='answer-container'>
+                    {!showResults && currentQuestion.options.map((option, index) => (
+                        <Button
+                            key={index}
+                            onClick={() => handleAnswerClick(option)}
+                        >
+                            {option}
+                        </Button>
+                    ))}
+                    {showResults &&
+                        <Button onClick={() => handleNextClicked()}>
+                            Next Question
+                        </Button>
+
+                    }
+                </div>
             </div>
         </div>
     )

@@ -1,0 +1,24 @@
+.page-background {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+}
+
+aside {
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    margin: 16px;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
