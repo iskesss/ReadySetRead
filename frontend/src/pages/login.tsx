@@ -65,15 +65,17 @@ export default function LoginAccount() {
                     {error && <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>}
 
                     <div className="ParentOrStudentToggle">
-                        <Button onClick={() => {
-                            setLoginType('student');
-                        }}>
+                        <Button 
+                            className={loginType == 'student' ? 'role-selected' : ''}
+                            onClick = {() => setLoginType('student')}
+                        >
                             Student
                         </Button>
 
-                        <Button onClick={() => {
-                            setLoginType('parent');
-                        }}>
+                        <Button  
+                            className={loginType === 'parent' ? 'role-selected' : ''}
+                            onClick={() => setLoginType('parent')}
+                        >
                             Parent
                         </Button>
                     </div>

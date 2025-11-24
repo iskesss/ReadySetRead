@@ -6,3 +6,9 @@
 .card {
     width: 400px;
 }
+
+.role-selected {
+    background-color: #272558; 
+    color: white;
+    border: 2px solid #d2691e;
+}
