@@ -1,5 +1,12 @@
 import { api } from "./client";
-import type { ParentSignupRequest, ParentLoginRequest, ParentResponse, TokenResponse } from "./types";
+import type {
+    ParentSignupRequest,
+    ParentLoginRequest,
+    ParentResponse,
+    TokenResponse,
+    ChildOut,
+    AdultOut
+} from "./types";
 
 // Register / signup a new parent
 export async function signupParent(
@@ -31,4 +38,17 @@ export async function getCurrentParent(): Promise<ParentResponse> {
 // Logout by deleting current
 export function logoutParent(): void {
     localStorage.removeItem("token");
+}
+
+// Get the current parent's linked student accounts
+export async function getStudents(): Promise<ChildOut[]> {
+    const parent = await getCurrentParent();
+    const response = await api.get<ChildOut[]>(`/adult/${parent.adult_email}/children`);
+    return response.data;
+}
+
+// Get my (current user) info
+export async function getMe(): Promise<AdultOut> {
+    const response = await api.get<AdultOut>('adult/me');
+    return response.data
 }

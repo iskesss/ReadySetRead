@@ -28,6 +28,10 @@ export interface GenerateQuizRequest {
   num_questions: number;
 }
 
+export interface studentListRequest {
+  adult_email: string
+}
+
 // API Response Types
 export interface ParentResponse {
   adult_email: string;
@@ -57,6 +61,18 @@ export interface QuizQuestion {
 
 export interface QuizResponse {
   questions: QuizQuestion[]
+}
+
+export interface ChildOut {
+  child_id: number;
+  child_name: string;
+  num_coins: number;
+  adult_email: string;
+}
+
+export interface AdultOut {
+  adult_email: string;
+  adult_name: string;
 }
 
 // Error Response Type

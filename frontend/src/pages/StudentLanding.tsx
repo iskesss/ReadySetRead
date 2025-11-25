@@ -34,6 +34,7 @@ export default function StudentLandingPage() {
                 state: { quizData }
             });
         } catch (error) {
+            console.log(error)
             setQuizError("Failed to generate quiz. Please try again.");
             setIsGeneratingQuiz(false);
         }
@@ -48,6 +49,7 @@ export default function StudentLandingPage() {
                 <h1>Welcome back!</h1>
                 <Link to="/"><Button>Log out</Button></Link>
                 <Link to="/library"><Button>Library</Button></Link>
+                <Link to="/rewards"><Button>Store</Button></Link>
             </div>
 
             {/* Book Tiles in matching grid layout */}
