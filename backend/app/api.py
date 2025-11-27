@@ -12,6 +12,7 @@ from .quiz_llm import generate_quiz_for_book
 
 ADULTS_TABLE = db.ADULTS_TABLE
 CHILDREN_TABLE = db.CHILDREN_TABLE
+QUIZZES_TABLE = db.QUIZZES_TABLE
 
 router = APIRouter(prefix="/v1")
 
@@ -89,6 +90,22 @@ class BookOut(BaseModel):
     title: str
     reading_level: int
     author: str
+
+# QUIZZES
+# —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
+class AssignQuizRequest(BaseModel):
+    child_id: int
+    book_id: int
+
+class QuizOut(BaseModel):
+    quiz_id: int
+    child_id: int
+    book_id: int
+    attempted: bool
+    passed: bool
+    score: int
+    feedback: str
+    qna: str
 
 # JWT AUTHENTICATION HELPER FUNCTIONS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
@@ -185,7 +202,7 @@ async def get_current_child(request: Request) -> ChildOut:
 def ping():
     return {"message": "PONG"}
 
-# ADULT SPECIFIC FUNCTIONS
+# ADULT AUTH
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
 @router.post("/adult/auth/signup", response_model=AdultOut, status_code=201)
 async def adult_signup(payload: AdultSignup): 
@@ -261,7 +278,7 @@ async def list_children_for_adult(adult_email: EmailStr, current: AdultOut = Dep
             rows = await db_cursor.fetchall()
             return [ChildOut(**row) for row in rows] # return a list of child JSON objects
 
-# CHILD-SPECIFIC FUNCTIONS
+# CHILD AUTH
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
 @router.post("/child/auth/signup", response_model=ChildOut, status_code=201)
 async def child_signup(payload: ChildSignup):
@@ -337,7 +354,7 @@ def generate_quiz_endpoint(
 
 # BOOKS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
-@router.get("/books", response_model=list[BookOut])
+@router.get("/books", response_model=list[BookOut]) # no auth required for this one
 async def list_all_books():
     pool = require_pool()
     async with pool.connection() as db_connection:
@@ -348,3 +365,57 @@ async def list_all_books():
             )
             rows = await db_cursor.fetchall()
             return [BookOut(**row) for row in rows]
+
+# QUIZ ASSIGNMENT
+# —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
+@router.post("/quiz/assign", response_model=QuizOut, status_code=201)
+async def assign_quiz(
+    payload: AssignQuizRequest,
+    current_adult: AdultOut = Depends(get_current_adult) # auth definitely required!
+):
+    pool = require_pool()
+    async with pool.connection() as db_connection:
+        db_connection.row_factory = dict_row
+        async with db_connection.cursor() as db_cursor:
+            await db_cursor.execute( # make sure that the child exists and belongs to the authenticated adult
+                f"SELECT child_id, adult_email FROM {CHILDREN_TABLE} WHERE child_id = %s",
+                (payload.child_id,)
+            )
+            child_row = await db_cursor.fetchone()
+            if not child_row:
+                raise HTTPException(status_code=404, detail="Child not found!")
+            if child_row["adult_email"] != current_adult.adult_email:
+                raise HTTPException(status_code=403, detail="You can only assign quizzes to your own kids")
+
+            # make sure the book exists
+            await db_cursor.execute(
+                f"SELECT book_id FROM {db.BOOKS_TABLE} WHERE book_id = %s",
+                (payload.book_id,)
+            )
+            book_row = await db_cursor.fetchone()
+            if not book_row:
+                raise HTTPException(status_code=404, detail="That book does not seem to exist")
+
+            # make sure a quiz doesn't already exist for this child-book combination
+            await db_cursor.execute(
+                f"SELECT quiz_id FROM {QUIZZES_TABLE} WHERE child_id = %s AND book_id = %s",
+                (payload.child_id, payload.book_id)
+            )
+            existing_quiz = await db_cursor.fetchone()
+            if existing_quiz:
+                raise HTTPException(status_code=409, detail="A quiz for this book has already been assigned to the specified child") # TODO:  verify this is actually returning the appropriate HTTP error code 
+
+            # insert new quiz (leave many fields blank)
+            await db_cursor.execute(
+                f"""
+                INSERT INTO {QUIZZES_TABLE} (child_id, book_id, attempted, passed, score, feedback, qna)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                RETURNING quiz_id, child_id, book_id, attempted, passed, score, feedback, qna
+                """,
+                (payload.child_id, payload.book_id, False, False, 0, "", "")
+            )
+            row = await db_cursor.fetchone()
+            if not row:
+                raise HTTPException(status_code=500, detail="Failed to create quiz assignment")
+
+            return QuizOut(**row)
