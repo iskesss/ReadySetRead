@@ -8,14 +8,14 @@ from jose import jwt, JWTError
 import bcrypt
 from psycopg.rows import dict_row
 from . import db
-from .quiz_llm import generate_quiz_for_book, QuizQuestionDict
+from .quiz_llm import generate_quiz_for_book
 
 ADULTS_TABLE = db.ADULTS_TABLE
 CHILDREN_TABLE = db.CHILDREN_TABLE
 
 router = APIRouter(prefix="/v1")
 
-# JORDAN'S GLORIOUS PYDANTIC SCHEMAS
+# SIGNUP / SIGNIN
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
 class AdultSignup(BaseModel):
     adult_email: EmailStr
@@ -81,6 +81,14 @@ class GenerateQuizRequest(BaseModel):
 
 class GenerateQuizResponse(BaseModel):
     questions: list[QuizQuestion]
+
+# BOOKS
+# —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
+class BookOut(BaseModel):
+    book_id: int
+    title: str
+    reading_level: int
+    author: str
 
 # JWT AUTHENTICATION HELPER FUNCTIONS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
@@ -325,4 +333,18 @@ def generate_quiz_endpoint(
 
     questions = [QuizQuestion(**q) for q in questions_dicts] # converts raw dicts into pydantic models
 
-    return GenerateQuizResponse(questions=questions)        # wrap them in the response model
+    return GenerateQuizResponse(questions=questions)
+
+# BOOKS
+# —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
+@router.get("/books", response_model=list[BookOut])
+async def list_all_books():
+    pool = require_pool()
+    async with pool.connection() as db_connection:
+        db_connection.row_factory = dict_row
+        async with db_connection.cursor() as db_cursor:
+            await db_cursor.execute(
+                f"SELECT book_id, title, reading_level, author FROM {db.BOOKS_TABLE}"
+            )
+            rows = await db_cursor.fetchall()
+            return [BookOut(**row) for row in rows]
