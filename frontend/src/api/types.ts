@@ -32,6 +32,11 @@ export interface studentListRequest {
   adult_email: string
 }
 
+export interface AssignQuizRequest {
+  child_id: number
+  book_id: number
+}
+
 // API Response Types
 export interface ParentResponse {
   adult_email: string;
@@ -63,16 +68,34 @@ export interface QuizResponse {
   questions: QuizQuestion[]
 }
 
-export interface ChildOut {
+export interface Child {
   child_id: number;
   child_name: string;
   num_coins: number;
   adult_email: string;
 }
 
-export interface AdultOut {
+export interface Adult {
   adult_email: string;
   adult_name: string;
+}
+
+export interface Book {
+  book_id: string;
+  title: string;
+  reading_level: number;
+  author: string;
+}
+
+export interface Assignment {
+  quiz_id: number;
+  child_id: number;
+  book_id: number;
+  attempted: boolean;
+  passed: boolean;
+  score: number;
+  feedback: string;
+  qna: string;
 }
 
 // Error Response Type

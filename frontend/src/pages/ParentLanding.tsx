@@ -12,11 +12,11 @@ import '../styles/App.css'
 
 // API imports
 import { getStudents, getMe } from '../api/parents'
-import type { ChildOut } from '../api/types'
+import type { Child } from '../api/types'
 
 
 export default function ParentLandingPage() {
-  const [students, setStudents] = useState<ChildOut[]>([])
+  const [students, setStudents] = useState<Child[]>([])
   const [me, setMe] = useState<string>()
 
   // ON PAGE LOAD: get my name for greeting

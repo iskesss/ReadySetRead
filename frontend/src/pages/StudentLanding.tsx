@@ -6,6 +6,8 @@ import { Button } from '../components/button';
 import StudentLandingBook from '../components/StudentLandingBook';
 import '../styles/LibraryBook.css'; // Make sure your CSS exists and is correct!
 
+import { getCurrentStudent } from '../api/students';
+
 type BookType = {
     title: string;
     status: 'passed' | 'incomplete';
@@ -40,6 +42,19 @@ export default function StudentLandingPage() {
         }
     }
 
+    async function navToLibrary() {
+        try {
+            const result = await getCurrentStudent();
+            const student_id = result.child_id;
+            sessionStorage.setItem('targetStudentId', JSON.stringify(student_id));
+            sessionStorage.setItem('meType', JSON.stringify('student'));
+            navigate('/library');
+        } catch (error) {
+            console.log(error)
+            return
+        }
+    }
+
     const passedCount = studentBooks.filter(b => b.status === "passed").length;
     const incompleteCount = studentBooks.filter(b => b.status === "incomplete").length;
 
@@ -48,7 +63,7 @@ export default function StudentLandingPage() {
             <div className="header">
                 <h1>Welcome back!</h1>
                 <Link to="/"><Button>Log out</Button></Link>
-                <Link to="/library"><Button>Library</Button></Link>
+                <Button onClick={navToLibrary}>Library</Button>
                 <Link to="/rewards"><Button>Store</Button></Link>
             </div>
 

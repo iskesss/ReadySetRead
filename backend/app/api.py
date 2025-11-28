@@ -160,6 +160,9 @@ async def _get_current(request: Request, expect_role: Literal["adult","child"]):
         payload = jwt.decode(token, JWT_SECRET, algorithms=[ JWT_ALGO ])
         sub = payload.get("sub")
         role = payload.get("role")
+        # TODO: Remove this debug after quiz assignment gen is confirmed to work -Will
+        print("Debug info:")
+        print("Sub: ", sub, " Role: ", role, " ExpRole: ", expect_role)
         if not sub or role != expect_role:
             raise HTTPException(status_code=401, detail="Invalid jwt token!!")
     except (JWTError, ValueError):
@@ -368,10 +371,19 @@ async def list_all_books():
 
 # QUIZ ASSIGNMENT
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
+
+# Helper function to combine authorization for quiz assignment
+async def get_current_user(request: Request) -> AdultOut | ChildOut:
+    try:
+        return await get_current_adult(request)
+    except HTTPException:
+        return await get_current_child(request)
+    
+
 @router.post("/quiz/assign", response_model=QuizOut, status_code=201)
 async def assign_quiz(
     payload: AssignQuizRequest,
-    current_adult: AdultOut = Depends(get_current_adult) # auth definitely required!
+    current_user: AdultOut | ChildOut = Depends(get_current_user) # auth definitely required!
 ):
     pool = require_pool()
     async with pool.connection() as db_connection:
@@ -384,8 +396,6 @@ async def assign_quiz(
             child_row = await db_cursor.fetchone()
             if not child_row:
                 raise HTTPException(status_code=404, detail="Child not found!")
-            if child_row["adult_email"] != current_adult.adult_email:
-                raise HTTPException(status_code=403, detail="You can only assign quizzes to your own kids")
 
             # make sure the book exists
             await db_cursor.execute(
@@ -419,3 +429,4 @@ async def assign_quiz(
                 raise HTTPException(status_code=500, detail="Failed to create quiz assignment")
 
             return QuizOut(**row)
+        

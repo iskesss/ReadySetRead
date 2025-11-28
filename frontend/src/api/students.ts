@@ -21,7 +21,6 @@ export async function loginStudent(
 
     return response.data;
 }
-
 // Get current student's information
 export async function getCurrentStudent(): Promise<StudentResponse> {
     const response = await api.get<StudentResponse>("/child/me");
