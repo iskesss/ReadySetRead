@@ -429,4 +429,43 @@ async def assign_quiz(
                 raise HTTPException(status_code=500, detail="Failed to create quiz assignment")
 
             return QuizOut(**row)
-        
+
+@router.get("/child/{child_id}/quizzes", response_model=list[QuizOut])
+async def list_quizzes_for_child(
+    child_id: int,
+    current_user: AdultOut | ChildOut = Depends(get_current_user)
+):
+    pool = require_pool()
+    async with pool.connection() as db_connection:
+        db_connection.row_factory = dict_row
+        async with db_connection.cursor() as db_cursor:
+            # verify the child exists and get their corresponding adult_email
+            await db_cursor.execute(
+                f"SELECT child_id, adult_email FROM {CHILDREN_TABLE} WHERE child_id = %s",
+                (child_id,)
+            )
+            child_row = await db_cursor.fetchone()
+            if not child_row:
+                raise HTTPException(status_code=404, detail="Child not found!")
+
+            # auth check: child can only view their own quizzes, adult can only view their children's quizzes
+            if isinstance(current_user, ChildOut):
+                if current_user.child_id != child_id:
+                    raise HTTPException(status_code=403, detail="You can't view other kids' quizzes!")
+            elif isinstance(current_user, AdultOut):
+                if current_user.adult_email != child_row["adult_email"]:
+                    raise HTTPException(status_code=403, detail="You can only view your own kids' quizzes!")
+
+            # fetch all quizzes for this child
+            await db_cursor.execute(
+                f"""
+                SELECT quiz_id, child_id, book_id, attempted, passed, score, feedback, qna
+                FROM {QUIZZES_TABLE}
+                WHERE child_id = %s
+                ORDER BY quiz_id
+                """,
+                (child_id,)
+            )
+            rows = await db_cursor.fetchall()
+            return [QuizOut(**row) for row in rows]
+
