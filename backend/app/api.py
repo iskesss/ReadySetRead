@@ -160,9 +160,6 @@ async def _get_current(request: Request, expect_role: Literal["adult","child"]):
         payload = jwt.decode(token, JWT_SECRET, algorithms=[ JWT_ALGO ])
         sub = payload.get("sub")
         role = payload.get("role")
-        # TODO: Remove this debug after quiz assignment gen is confirmed to work -Will
-        print("Debug info:")
-        print("Sub: ", sub, " Role: ", role, " ExpRole: ", expect_role)
         if not sub or role != expect_role:
             raise HTTPException(status_code=401, detail="Invalid jwt token!!")
     except (JWTError, ValueError):

@@ -78,6 +78,12 @@ def generate_quiz_for_book(
     
     num_questions = max(1, min(num_questions, 20))  #questions capped between 1 and 20
 
+    # ========================================================
+    # NOTES FOR PROMPT ENGINEERING -Will
+    # 1. Sometimes the first option is always the correct option, tell it to randomize answer order
+    # 2.
+    # ========================================================
+
     system_prompt = (                   #system-level instructions for the LLM
         "You are a reading-comprehension tutor for elementary school students "
         "(grades K–6). You will be told the title (and sometimes author) of a "

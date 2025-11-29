@@ -87,7 +87,7 @@ export interface Book {
   author: string;
 }
 
-export interface Assignment {
+export interface Assignment { //Corresponds to QuizOut in backend
   quiz_id: number;
   child_id: number;
   book_id: number;

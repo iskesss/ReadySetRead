@@ -1,5 +1,5 @@
 import { api } from "./client";
-import type { StudentSignupRequest, StudentLoginRequest, StudentResponse, TokenResponse } from "./types";
+import type { StudentSignupRequest, StudentLoginRequest, StudentResponse, TokenResponse, Assignment } from "./types";
 
 // Register / Sign up a new student account
 export async function signupStudent(
@@ -30,4 +30,10 @@ export async function getCurrentStudent(): Promise<StudentResponse> {
 // Log out by deleting the current token
 export function logoutStudent(): void {
     localStorage.removeItem("token");
+}
+
+// List all the student's currently assigned book quizzes
+export async function listAllQuizAssignments(child_id: number): Promise<Assignment[]> {
+    const response = await api.get<Assignment[]>(`/child/${child_id}/quizzes`)
+    return response.data
 }

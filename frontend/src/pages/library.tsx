@@ -1,5 +1,5 @@
 // import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 
@@ -78,11 +78,9 @@ export default function Library() {
     return (
         <div className='page-background'>
             <main>
-                <Link to="/">
-                    <Button onClick={backClicked}>
-                        Go back
-                    </Button>
-                </Link>
+                <Button onClick={backClicked}>
+                    Go back
+                </Button>
                 {error && (
                     <div className="error-message" style={{ color: 'red', margin: '10px 0' }}>
                         {error}
