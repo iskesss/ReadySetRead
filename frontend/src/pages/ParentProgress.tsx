@@ -11,13 +11,17 @@ import '../styles/App.css'
 
 // API imports
 import { getStudents } from '../api/parents';
-import type { Child } from "../api/types"
+import { listAllQuizAssignments } from '../api/students';
+import { getAllBooks } from '../api/books'
+import type { Child, Book, Assignment } from "../api/types"
 
 export default function ParentProgress() {
   const navigate = useNavigate();
 
   const [students, setStudents] = useState<Child[]>()
   const [selectedChild, setSelectedChild] = useState<Child>();
+  const [books, setBooks] = useState<Book[]>([]);
+  const [bookAssignments, setBookAssignments] = useState<Assignment[]>([])
 
   // ON PAGE LOAD: Get this parent's kids
   useEffect(() => {
@@ -32,6 +36,33 @@ export default function ParentProgress() {
     fetchData()
   }, []);
 
+  // ON PAGE LOAD: Get all books, for reference by assignments to get book information
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await getAllBooks()
+        setBooks(result)
+      } catch (error) {
+        console.error('Error getting all books: ', error)
+      }
+    }
+    fetchData()
+  }, [])
+
+  // ON selectedChild UPDATE: Get this student's book assignments
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (selectedChild?.child_id != null) {
+          const result = await listAllQuizAssignments(selectedChild.child_id)
+          setBookAssignments(result)
+        }
+      } catch (error) {
+        console.error('Error getting list of student quiz assignments: ', error)
+      }
+    }
+    fetchData()
+  }, [selectedChild])
 
   async function navToLibrary() {
     if (!selectedChild) return;
@@ -105,15 +136,34 @@ export default function ParentProgress() {
           </div>
         </div>
 
-
-        {/* list of books -- right column --> CONNECT TO BACKEND */}
         <div className="booksCard">
           <h2> Books completed: </h2>
           <div className="bookList">
-            <div className="book">Book 1</div>
-            <div className="book">Book 2</div>
-            <div className="book">Book 3</div>
-            <div className="book">Book 4</div>
+            {bookAssignments.map(assignment => {
+              // Find the corresponding book using book_id
+              // book.book_id is a string, assignment.book_id is a number
+              const book = books?.find(b => parseInt(b.book_id) === assignment.book_id);
+
+              if (!book) {
+                console.log('No book found for assignment book_id:', assignment.book_id);
+                return null;
+              }
+
+              // build the combined book object
+              const bookWithStatus = {
+                title: book.title,
+                status: assignment.passed ? 'passed' : 'incomplete',
+                level: book.reading_level
+              };
+
+              return (
+                <div className="book">
+                  <p><b>Title:</b> {bookWithStatus.title} </p>
+                  <p><b>Reading Level:</b> {bookWithStatus.level} </p>
+                  <p><b>Status:</b> {bookWithStatus.status} </p>
+                </div>
+              );
+            })}
           </div>
         </div>
 
