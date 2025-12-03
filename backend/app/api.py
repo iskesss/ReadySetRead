@@ -106,6 +106,10 @@ class QuizOut(BaseModel):
     score: int
     feedback: str
 
+class UpdateQuizRequest(BaseModel):
+    quiz_id: int
+    score: int = Field(ge=0, le=10, description="Quiz score from 0 to 10")
+
 # JWT AUTHENTICATION HELPER FUNCTIONS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
 BCRYPT_ROUNDS = int(os.getenv("BCRYPT_ROUNDS", "12"))
@@ -464,4 +468,69 @@ async def list_quizzes_for_child(
             )
             rows = await db_cursor.fetchall()
             return [QuizOut(**row) for row in rows]
+
+@router.post("/quiz/update", response_model=QuizOut)
+async def update_quiz_result(
+    payload: UpdateQuizRequest,
+    current_child: ChildOut = Depends(get_current_child)
+):
+    pool = require_pool()
+    async with pool.connection() as db_connection:
+        db_connection.row_factory = dict_row
+        async with db_connection.cursor() as db_cursor:
+            # fetch the current quiz record to get previous state of it 
+            await db_cursor.execute(
+                f"""
+                SELECT quiz_id, child_id, book_id, attempted, passed, score, feedback
+                FROM {QUIZZES_TABLE}
+                WHERE quiz_id = %s
+                """,
+                (payload.quiz_id,)
+            )
+            quiz_row = await db_cursor.fetchone()
+            if not quiz_row:
+                raise HTTPException(status_code=404, detail="Quiz not found!")
+
+            # Verify this quiz belongs to the authenticated child
+            if quiz_row["child_id"] != current_child.child_id:
+                raise HTTPException(status_code=403, detail="You can't write to other kids' quizzes!")
+
+            # determine new passed status
+            new_passed = payload.score == 10
+            previous_passed = quiz_row["passed"]
+
+            # figure out how many coins we should be awarding to the child
+            if payload.score == 10 and not previous_passed:
+                coins_to_add = 50
+            else:
+                coins_to_add = payload.score
+
+            # update the quiz record (set attempted=true, passed based on score, & update score)
+            await db_cursor.execute(
+                f"""
+                UPDATE {QUIZZES_TABLE}
+                SET attempted = true, passed = %s, score = %s
+                WHERE quiz_id = %s
+                RETURNING quiz_id, child_id, book_id, attempted, passed, score, feedback
+                """,
+                (new_passed, payload.score, payload.quiz_id)
+            )
+            updated_quiz = await db_cursor.fetchone()
+            if not updated_quiz:
+                raise HTTPException(status_code=500, detail="Failed to update quiz")
+
+            # update kid's coins
+            await db_cursor.execute(
+                f"""
+                UPDATE {CHILDREN_TABLE}
+                SET num_coins = num_coins + %s
+                WHERE child_id = %s
+                """,
+                (coins_to_add, current_child.child_id)
+            )
+
+            # commit the transaction to the DB
+            await db_connection.commit()
+
+            return QuizOut(**updated_quiz)
 
