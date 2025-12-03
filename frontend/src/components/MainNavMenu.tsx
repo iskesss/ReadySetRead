@@ -2,10 +2,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "./button";
 import logo from "../logo.png";
+import { getCurrentStudent } from "../api/students";
 
 interface NavMenuProps {
   userType?: "parent" | "student";
 }
+
+type LinkDef = {
+  name: string;
+  path: string;
+  needsStudentContext?: boolean;
+};
 
 export default function NavMenu({ userType }: NavMenuProps) {
   const navigate = useNavigate();
@@ -16,21 +23,35 @@ export default function NavMenu({ userType }: NavMenuProps) {
     navigate("/");
   };
 
-  const go = (path: string) => {
-    setOpen(false);
-    navigate(path);
-  };
-
-  const studentLinks = [
-    { name: "Library", path: "/library" },
+  const studentLinks: LinkDef[] = [
+    { name: "Library", path: "/library", needsStudentContext: true },
     { name: "Rewards", path: "/rewards" },
   ];
 
-  const parentLinks = [{ name: "Child Progress", path: "/ParentProgress" }];
+  const parentLinks: LinkDef[] = [{ name: "Child Progress", path: "/ParentProgress" }];
 
   const links = userType === "parent" ? parentLinks : studentLinks;
 
   const homePath = userType === "parent" ? "/parentLanding" : "/studentLanding";
+
+  const go = async (link: LinkDef) => {
+    setOpen(false);
+
+    // for students going to Library, set targetStudentId + meType
+    if (userType === "student" && link.needsStudentContext) {
+      try {
+        const result = await getCurrentStudent();
+        const student_id = result.child_id;
+        sessionStorage.setItem("targetStudentId", JSON.stringify(student_id));
+        sessionStorage.setItem("meType", JSON.stringify("student"));
+      } catch (error) {
+        console.error("Error preparing library context", error);
+        return;
+      }
+    }
+
+    navigate(link.path);
+  };
 
   return (
     <header
@@ -46,7 +67,6 @@ export default function NavMenu({ userType }: NavMenuProps) {
         zIndex: 10,
       }}
     >
-      {/* clickable logo only */}
       <button
         type="button"
         onClick={() => navigate(homePath)}
@@ -62,7 +82,6 @@ export default function NavMenu({ userType }: NavMenuProps) {
         <img src={logo} alt="ReadySetRead" style={{ height: 80 }} />
       </button>
 
-      {/* menu button + dropdown */}
       <div style={{ position: "relative" }}>
         <Button type="button" onClick={() => setOpen((prev) => !prev)}>
           ☰ Menu
@@ -102,7 +121,7 @@ export default function NavMenu({ userType }: NavMenuProps) {
               <button
                 key={link.name}
                 type="button"
-                onClick={() => go(link.path)}
+                onClick={() => go(link)}
                 style={{
                   width: "100%",
                   padding: "8px 12px",

@@ -26,14 +26,16 @@ createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
-          <Route element={<Layout />}>
-          <Route path="/parentLanding" element={<ParentLanding />} />
+          <Route element={<Layout userType="student" />}>
+          <Route path="/Rewards" element={<Rewards />} />
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/studentLanding" element={<StudentLandingPage />} />
           <Route path="/quiz" element={<QuizPage />} />
           <Route path="/quizResults" element={<QuizResultsPage />} />
+          </Route>
+          <Route element={<Layout userType="parent" />}>
+          <Route path="/parentLanding" element={<ParentLanding />} />
           <Route path="/ParentProgress" element={<ParentProgress />} />
-          <Route path="/Rewards" element={<Rewards />} />
             </Route>
         </Routes >
       </BrowserRouter >
