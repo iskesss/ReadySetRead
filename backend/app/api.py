@@ -110,6 +110,16 @@ class UpdateQuizRequest(BaseModel):
     quiz_id: int
     score: int = Field(ge=0, le=10, description="Quiz score from 0 to 10")
 
+# COINS
+# —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
+class SpendCoinsRequest(BaseModel):
+    coins_to_spend: int = Field(gt=0, description="Number of coins to deduct (must be positive)")
+
+class SpendCoinsResponse(BaseModel):
+    success: bool
+    remaining_coins: int
+    message: str
+
 # JWT AUTHENTICATION HELPER FUNCTIONS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
 BCRYPT_ROUNDS = int(os.getenv("BCRYPT_ROUNDS", "12"))
@@ -533,4 +543,54 @@ async def update_quiz_result(
             await db_connection.commit()
 
             return QuizOut(**updated_quiz)
+
+# COIN SPENDING ENDPOINT
+# —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
+@router.post("/child/spend-coins", response_model=SpendCoinsResponse)
+async def spend_coins(
+    payload: SpendCoinsRequest,
+    current_child: ChildOut = Depends(get_current_child)
+):
+    pool = require_pool()
+    async with pool.connection() as db_connection:
+        db_connection.row_factory = dict_row
+        async with db_connection.cursor() as db_cursor:
+            # fetch current coin balance
+            await db_cursor.execute(
+                f"SELECT num_coins FROM {CHILDREN_TABLE} WHERE child_id = %s",
+                (current_child.child_id,)
+            )
+            row = await db_cursor.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="Child not found!")
+
+            current_coins = row["num_coins"]
+
+            # check if the kid currently has enough coins
+            if current_coins < payload.coins_to_spend:
+                return SpendCoinsResponse(
+                    success=False,
+                    remaining_coins=current_coins,
+                    message=f"You have insufficient coins! You have {current_coins} coins but need {payload.coins_to_spend}."
+                )
+
+            # deduct coins
+            new_balance = current_coins - payload.coins_to_spend
+            await db_cursor.execute(
+                f"""
+                UPDATE {CHILDREN_TABLE}
+                SET num_coins = %s
+                WHERE child_id = %s
+                """,
+                (new_balance, current_child.child_id)
+            )
+
+            # commit the transaction
+            await db_connection.commit()
+
+            return SpendCoinsResponse(
+                success=True,
+                remaining_coins=new_balance,
+                message=f"You have successfully spent {payload.coins_to_spend} coins!"
+            )
 

@@ -104,59 +104,75 @@ export default function StudentLandingPage() {
     const passedCount = studentAssignments.filter(a => a.passed).length;
     const incompleteCount = studentAssignments.filter(a => !a.passed).length;
 
-    return (
-        <div className="studentLandingContainer">
+return (
+  <div className="studentLandingContainer">
+    <div
+      style={{
+        display: "flex",
+        gap: "24px",
+        alignItems: "flex-start",
+        marginTop: "24px",
+      }}
+    >
+      {/* left: books using existing libraryGrid CSS */}
+      <div style={{ flex: 3 }}>
+        <div className="libraryGrid">
+          {studentAssignments.map((assignment) => {
+            const book = books?.find(
+              (b) => parseInt(b.book_id) === assignment.book_id
+            );
 
+            if (!book) {
+              console.log(
+                "No book found for assignment book_id:",
+                assignment.book_id
+              );
+              return null;
+            }
 
-            <div className="libraryGrid">
-                {studentAssignments.map(assignment => {
-                    // Find the corresponding book using book_id
-                    // book.book_id is a string, assignment.book_id is a number
-                    const book = books?.find(b => parseInt(b.book_id) === assignment.book_id);
+            const bookWithStatus: BookType = {
+              title: book.title,
+              status: assignment.passed ? "passed" : "incomplete",
+              level: book.reading_level,
+            };
 
-                    if (!book) {
-                        console.log('No book found for assignment book_id:', assignment.book_id);
-                        return null;
-                    }
-
-                    // build the combined book object
-                    const bookWithStatus: BookType = {
-                        title: book.title,
-                        status: assignment.passed ? 'passed' : 'incomplete',
-                        level: book.reading_level
-                    };
-
-                    return (
-                        <StudentLandingBook
-                            key={assignment.quiz_id}
-                            title={bookWithStatus.title}
-                            status={bookWithStatus.status}
-                            level={bookWithStatus.level}
-                            onTakeQuiz={() => takeQuiz(bookWithStatus)}
-                            isGeneratingQuiz={isGeneratingQuiz}
-                        />
-                    );
-                })}
-            </div>
-
-            <div className="progressReport">
-                <h2>Progress Report</h2>
-                <div className="progressStats">
-                    <div>{passedCount} passed</div>
-                    <div>{incompleteCount} incomplete</div>
-                </div>
-            </div>
-
-            {isGeneratingQuiz && (
-                <div className="loading-message">
-                    <p>Please wait while we generate your quiz...</p>
-                </div>
-            )}
-            {quizError && (
-                <div className="error-message">
-                    <p style={{ color: 'red' }}>{quizError}</p>
-                </div>
-            )}
+            return (
+              <StudentLandingBook
+                key={assignment.quiz_id}
+                title={bookWithStatus.title}
+                status={bookWithStatus.status}
+                level={bookWithStatus.level}
+                onTakeQuiz={() => takeQuiz(bookWithStatus)}
+                isGeneratingQuiz={isGeneratingQuiz}
+              />
+            );
+          })}
         </div>
-    );
+      </div>
+
+      {/* right: progress card only on this page */}
+      <div
+        className="progressReportCard"
+      >
+        <h2>Progress Report</h2>
+        <div className="progressStats">
+          <div>{passedCount} passed</div>
+          <div>{incompleteCount} incomplete</div>
+        </div>
+      </div>
+    </div>
+
+    {isGeneratingQuiz && (
+      <div className="loading-message">
+        <p>Please wait while we generate your quiz...</p>
+      </div>
+    )}
+    {quizError && (
+      <div className="error-message">
+        <p style={{ color: "red" }}>{quizError}</p>
+      </div>
+    )}
+  </div>
+);
+
 }
