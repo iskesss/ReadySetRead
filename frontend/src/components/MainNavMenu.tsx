@@ -64,7 +64,7 @@ export default function NavMenu({ userType }: NavMenuProps) {
         justifyContent: "space-between",
         padding: "12px 24px",
         borderBottom: "1px solid #ddd",
-        background: "#fff",
+        background: "transparent",
         boxSizing: "border-box",
         zIndex: 10,
       }}
