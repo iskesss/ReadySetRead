@@ -105,7 +105,6 @@ class QuizOut(BaseModel):
     passed: bool
     score: int
     feedback: str
-    qna: str
 
 # JWT AUTHENTICATION HELPER FUNCTIONS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
@@ -415,11 +414,11 @@ async def assign_quiz(
             # insert new quiz (leave many fields blank)
             await db_cursor.execute(
                 f"""
-                INSERT INTO {QUIZZES_TABLE} (child_id, book_id, attempted, passed, score, feedback, qna)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-                RETURNING quiz_id, child_id, book_id, attempted, passed, score, feedback, qna
+                INSERT INTO {QUIZZES_TABLE} (child_id, book_id, attempted, passed, score, feedback)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                RETURNING quiz_id, child_id, book_id, attempted, passed, score, feedback
                 """,
-                (payload.child_id, payload.book_id, False, False, 0, "", "")
+                (payload.child_id, payload.book_id, False, False, 0, "")
             )
             row = await db_cursor.fetchone()
             if not row:
@@ -456,7 +455,7 @@ async def list_quizzes_for_child(
             # fetch all quizzes for this child
             await db_cursor.execute(
                 f"""
-                SELECT quiz_id, child_id, book_id, attempted, passed, score, feedback, qna
+                SELECT quiz_id, child_id, book_id, attempted, passed, score, feedback
                 FROM {QUIZZES_TABLE}
                 WHERE child_id = %s
                 ORDER BY quiz_id
