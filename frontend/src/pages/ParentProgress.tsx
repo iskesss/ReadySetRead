@@ -36,6 +36,12 @@ export default function ParentProgress() {
     fetchData()
   }, []);
 
+  // ON PAGE LOAD: Set first student as default
+  useEffect(() => {
+    if (students && students.length > 0)
+      setSelectedChild(students[0])
+  }, [students]);
+
   // ON PAGE LOAD: Get all books, for reference by assignments to get book information
   useEffect(() => {
     const fetchData = async () => {
@@ -100,7 +106,7 @@ export default function ParentProgress() {
         <div className="progressCard">
           <h1>{selectedChild?.child_name}'s Progress</h1>
 
-          {/* assigned goals -- MUST LINK TO BACKANED HERE -- also adjust how % caluclated*/}
+          {/* assigned goals -- MUST LINK TO BACKEND HERE -- also adjust how % caluclated*/}
           <div className="goalRow">
             <span>Goal 1:</span>
             <div className="progressBar">

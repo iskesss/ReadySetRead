@@ -20,7 +20,6 @@ export default function Quiz() {
     const navigate = useNavigate();
 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    // const [userAnswers, setUserAnswers] = useState<string[]>([]);
     const [showResults, setShowResults] = useState(false);
     const [score, setScore] = useState(0);
 
@@ -29,21 +28,22 @@ export default function Quiz() {
 
     const handleAnswerClick = (selectedOption: string) => {
         if (selectedOption == quizData.questions[currentQuestionIndex].correct_answer) {
-            setScore(score + 1);
-            setCurrentQuestionIndex(currentQuestionIndex + 1);
+            const newScore = score + 1;
+            setScore(newScore);
+
+            if (isLastQuestion) {
+                navigate('/quizResults', {
+                    state: {
+                        quizData: quizData,
+                        score: newScore  // Use the new score here
+                    }
+                })
+            } else {
+                setCurrentQuestionIndex(currentQuestionIndex + 1);
+            }
         }
         else {
             setShowResults(true);
-        }
-        // const newAnswers = [...userAnswers, selectedOption];
-
-        if (isLastQuestion) {
-            navigate('/quizResults', {
-                state: {
-                    quizData: quizData,
-                    score: score
-                }
-            })
         }
     }
 
