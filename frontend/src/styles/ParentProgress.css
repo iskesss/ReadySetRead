@@ -8,13 +8,8 @@
   align-items: center;
 }
 
-/* designs for buttons on top row*/
-.logoutBtn {
-    position: absolute;
-    top: 15px;
-    right: 25px;
-    font-size: 18px;
-}
+
+
 
 .headerButtons {
   display: flex;

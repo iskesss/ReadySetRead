@@ -55,11 +55,6 @@ export default function ParentLandingPage() {
     <div className='parentLandingContainer'>
 
       <div className='header'>
-        <Link to="/">
-          <Button className="btn logoutBtn">
-            Log out
-          </Button>
-        </Link>
 
         <h1> Welcome, {me}!</h1>
       </div>

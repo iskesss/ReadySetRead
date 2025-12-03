@@ -27,8 +27,11 @@ export default function NavMenu({ userType }: NavMenuProps) {
     { name: "Library", path: "/library", needsStudentContext: true },
     { name: "Rewards", path: "/rewards" },
   ];
-
-  const parentLinks: LinkDef[] = [{ name: "Child Progress", path: "/ParentProgress" }];
+//changed the routing file idk if there is a better fix then doing this and having two seperate libary routes someone can fix if want
+  const parentLinks: LinkDef[] = [
+    { name: "Child Progress", path: "/ParentProgress" },
+    { name: "Library", path: "/ParentLibrary" },
+  ];
 
   const links = userType === "parent" ? parentLinks : studentLinks;
 
@@ -37,7 +40,6 @@ export default function NavMenu({ userType }: NavMenuProps) {
   const go = async (link: LinkDef) => {
     setOpen(false);
 
-    // for students going to Library, set targetStudentId + meType
     if (userType === "student" && link.needsStudentContext) {
       try {
         const result = await getCurrentStudent();

@@ -36,6 +36,7 @@ createRoot(document.getElementById('root')!).render(
           <Route element={<Layout userType="parent" />}>
           <Route path="/parentLanding" element={<ParentLanding />} />
           <Route path="/ParentProgress" element={<ParentProgress />} />
+          <Route path="/ParentLibrary" element={<LibraryPage />} />
             </Route>
         </Routes >
       </BrowserRouter >
