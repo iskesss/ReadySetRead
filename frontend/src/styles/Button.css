@@ -1,8 +1,18 @@
 .btn {
-    margin: 3px;
-    padding: 10px;
-    border-radius: 8px;
-    background-color: var(--spaceCadet);
-    color: white;
-    cursor: pointer;
+  margin: 3px;
+  padding: 0.75rem;
+  width: 100%;           /* remove or adjust if you don't want full‑width everywhere */
+  border-radius: 12px;   /* match login card buttons */
+  background-color: var(--spaceCadet);  /* same blue as login */
+  color: white;
+  cursor: pointer;
+  border: none;
+  font-size: 1rem;
+  font-weight: bold;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+  background-color: #1b315e;  /* slightly darker blue */
 }
