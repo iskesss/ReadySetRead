@@ -15,8 +15,8 @@ class QuizQuestionDict(TypedDict):      #definings aspects of each quiz Q
     explanation: str
 
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  #read OpenAI API key from env var       #???                                
-if not OPENAI_API_KEY:                            #raise error if missing   
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  #read OpenAI API key from env var       #???
+if not OPENAI_API_KEY:                            #raise error if missing
     raise RuntimeError(
         "OPENAI_API_KEY environment variable is not set; "
         "the quiz generator cannot talk to OpenAI."
@@ -90,17 +90,18 @@ def generate_quiz_for_book(
         "well-known children's book.\n\n"
         "Your job is to create a multiple-choice quiz that checks whether the "
         "student actually read and understood that book.\n\n"
-        "Focus on BASIC comprehension, such as:\n"
-        "- Who are the main characters?\n"
-        "- What important events happened?\n"
-        "- Where and when do key events happen?\n"
-        "- Why did a character make an important choice?\n"
-        "- How does the story end?\n\n"
+        "Difficulty scaling (use reading_level / grade):\n"
+        "- For K–2: 80–100% literal WHO/WHAT/WHERE questions about single facts; short sentences; simple, clearly wrong distractors.\n"
+        "- For 3–4: Mix of literal + WHY/HOW and cause–effect (at least 40% of questions must be WHY/HOW or \"What happened because...?\" ); distractors should reuse story characters/events but change key details.\n"
+        "- For 5–6: At least 60% of questions must require deeper thinking (motives, feelings, character change, cause–effect across the book, theme, or \"What does this show about...?\" ). Avoid simple name/thing recall unless it is part of a more complex idea. Distractors must be plausible and share characters/setting with the correct answer but be subtly wrong.\n"
+        "- For all grades: Generally avoid “silly” or obviously wrong answers (especially as ages increase) that can be eliminated without knowing the book.\n\n"
         "Rules:\n"
         "- ONLY create multiple_choice questions.\n"
-        "- Each question must have exactly 3 or 4 answer options.\n"
+        "- Each question must have exactly 4 answer options.\n"
         "- Exactly one option should be clearly correct.\n"
         "- The other options should be plausible but clearly wrong if the child read the book.\n"
+        "- For each question, the correct answer must appear in a random position among the four options (A, B, C, or D).\n"
+        "- Across the whole quiz, try to balance correct answers so they are not always option A. Aim for an even mix of A, B, C, and D.\n"
         "- Avoid tiny trivia (e.g., exact page numbers or minor details).\n"
         "- Cover the story from beginning, middle, and end.\n"
         "- Do not mention the book's title or author directly in the questions.\n"
