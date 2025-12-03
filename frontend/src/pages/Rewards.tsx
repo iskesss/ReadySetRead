@@ -7,6 +7,7 @@ import { Button } from '../components/button';
 //Style imports
 import '../styles/Rewards.css'
 import '../styles/App.css'
+import Layout from "../components/layout";
 
 
 {/**
@@ -19,12 +20,7 @@ import '../styles/App.css'
 export default function Rewards() {
     return(
         <div className='rewardsContainer'>
- 
-            <Link to="/">
-                <Button className="btn logoutBtn">
-                    Log out
-                </Button>
-            </Link>
+
 
             <div className='topRow'>
 

@@ -1,8 +1,7 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { generateQuiz } from '../api/quiz';
-import { Button } from '../components/button';
-import '../styles/LibraryBook.css'; // Make sure your CSS exists and is correct!
+import '../styles/LibraryBook.css'; 
 
 //Component Imports
 import StudentLandingBook from '../components/StudentLandingBook';
@@ -107,12 +106,7 @@ export default function StudentLandingPage() {
 
     return (
         <div className="studentLandingContainer">
-            <div className="header">
-                <h1>Welcome back!</h1>
-                <Link to="/"><Button>Log out</Button></Link>
-                <Button onClick={navToLibrary}>Library</Button>
-                <Link to="/rewards"><Button>Store</Button></Link>
-            </div>
+
 
             <div className="libraryGrid">
                 {studentAssignments.map(assignment => {

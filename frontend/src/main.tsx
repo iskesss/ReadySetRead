@@ -11,6 +11,7 @@ import LibraryPage from './pages/library.tsx'
 import QuizPage from './pages/Quiz.tsx'
 import QuizResultsPage from './pages/QuizResults.tsx'
 import Rewards from './pages/Rewards.tsx'
+import Layout from "./components/layout";
 
 import StudentLandingPage from './pages/StudentLanding.tsx';
 import { StudentBooksProvider } from './components/StudentBooksContext.tsx';
@@ -25,6 +26,7 @@ createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
+          <Route element={<Layout />}>
           <Route path="/parentLanding" element={<ParentLanding />} />
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/studentLanding" element={<StudentLandingPage />} />
@@ -32,6 +34,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/quizResults" element={<QuizResultsPage />} />
           <Route path="/ParentProgress" element={<ParentProgress />} />
           <Route path="/Rewards" element={<Rewards />} />
+            </Route>
         </Routes >
       </BrowserRouter >
     </StudentBooksProvider>
