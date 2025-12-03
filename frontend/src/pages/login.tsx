@@ -10,10 +10,10 @@ import { loginStudent } from '../api/students';
 import { Button } from "../components/button"
 
 // Style imports
-import '../styles/Login.css'
+import '../styles/Signup.css'
 
 export default function LoginAccount() {
-    const [loginType, setLoginType] = useState('student');
+    const [loginType, setloginType] = useState('student');
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -57,62 +57,61 @@ export default function LoginAccount() {
                 <img src={logo} className="logo" alt="Logo" />
             </div>
 
-            <main>
-                <div className="card">
-                    <h1 className="header">Sign In</h1>
-                    <p className="subheader">Select your login type:</p>
 
-                    {error && <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>}
+            <div className="card">
+                <h1 className="header">Login Here</h1>
+                <p className="subheader">Select your login type:</p>
 
-                    <div className="ParentOrStudentToggle">
-                        <Button 
-                            className={loginType == 'student' ? 'role-selected' : ''}
-                            onClick = {() => setLoginType('student')}
-                        >
-                            Student
-                        </Button>
+                {error && <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>}
 
-                        <Button  
-                            className={loginType === 'parent' ? 'role-selected' : ''}
-                            onClick={() => setLoginType('parent')}
-                        >
-                            Parent
-                        </Button>
-                    </div>
-
-                    <form
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            AfterSubmitClicked();
-                        }}
+                <div className="ParentOrStudentToggle">
+                    <Button 
+                    className={loginType === 'student' ? 'active' : ''} 
+                    onClick={() => setloginType('student')}
                     >
-                        <input
-                            value={id}
-                            onChange={(e) => setId(e.target.value)}
-                            placeholder={idPlaceholder}
-                            required
-                        />
+                    Student
+                    </Button>
 
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Password"
-                            required
-                        />
-                        <Button type="submit" disabled={loading}>
-                            {loading
-                                ? 'Logging in...'
-                                : loginType === 'student' ? 'Login as student' : 'Login as Parent'}
-                        </Button>
-                        <Link to="/signup">
-                            <Button type="button">
-                                Create Account Instead
-                            </Button>
-                        </Link>
-                    </form>
+                    <Button 
+                    className={loginType === 'parent' ? 'active' : ''} 
+                    onClick={() => setloginType('parent')}
+                    >
+                    Parent
+                    </Button>
                 </div>
-            </main>
+
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        AfterSubmitClicked();
+                    }}
+                >
+                    <input
+                        value={id}
+                        onChange={(e) => setId(e.target.value)}
+                        placeholder={idPlaceholder}
+                        required
+                    />
+
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
+                        required
+                    />
+                    <Button type="submit" disabled={loading}>
+                        {loading
+                            ? 'Logging in...'
+                            : loginType === 'student' ? 'Login as student' : 'Login as Parent'}
+                    </Button>
+                    <Link to="/signup">
+                        <Button type="button">
+                            Create Account Instead
+                        </Button>
+                    </Link>
+                </form>
+            </div>
         </div>
     );
 }

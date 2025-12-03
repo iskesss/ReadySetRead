@@ -1,8 +1,106 @@
+html, body, #root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.page-background {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    background: linear-gradient(105deg, var(--celadon), var(--pumpkin));
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+    gap: 2rem;
+}
+
 .logo {
     width: 150px;
     height: auto;
 }
 
 .card {
-    width: 400px;
+    width: 90%;
+    max-width: 450px;
+    min-width: 300px;
+    padding: 2rem;
+    border-radius: 16px;
+    background-color: white;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: width 0.3s ease, padding 0.3s ease;
+}
+
+@media (max-width: 500px) {
+    .card {
+        width: 95%;
+        padding: 1.5rem;
+    }
+}
+
+.card input {
+    width: 100%;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+.card button {
+    width: 100%;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    background-color: var(--pumpkin);
+    color: white;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.card button:hover {
+    background-color: #e66b1d;
+}
+
+.ParentOrStudentToggle {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.ParentOrStudentToggle button {
+    flex: 1;
+    background-color: #eee;
+    color: var(--spaceCadet);
+    font-weight: bold;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 12px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.ParentOrStudentToggle button:hover {
+    background-color: var(--celadon);
+    color: var(--spaceCadet);
+}
+
+.ParentOrStudentToggle button.active {
+    background-color: var(--pumpkin);
+    color: white;
+}
+
+.card p[style*="color: red"] {
+    margin-bottom: 1rem;
 }

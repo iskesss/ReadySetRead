@@ -1,91 +1,119 @@
 #root {
-
-  /* Primary color scheme */
-
   --pumpkin: #F97B27;
   --celadon: #AED0B1;
   --spaceCadet: #272558;
   --salmon: lightsalmon;
 
-  /* This will be main app background color */
-  background-color: white;
-
-  max-width: 1280px;
-  text-align: center;
-  height: 100%;
-}
-
-/* MAIN PAGE SIZING STYLES */
-
-html,
-body {
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  height: 100%;
-  overflow: hidden;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  width: 100%;
 }
 
 .page-background {
-  height: 100%;
-  overflow: hidden;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2rem;
+  min-height: 100vh;
+  width: 100%;
+  padding: 2rem 1rem;
+  background: linear-gradient(105deg, var(--celadon), var(--pumpkin));
   box-sizing: border-box;
 }
 
-/* LOGO STYLES, app-wide */
-/* Sizing info goes in each page's css not here */
-
 .logo {
-  padding: 1em;
-  will-change: filter;
-  transition: filter 300ms;
+  width: 150px;
+  height: auto;
 }
-
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-/* CARD STYLES, app-wide */
-/* Sizing info goes in each page's css not here */
 
 .card {
+  width: 100%;
+  max-width: 450px;
+  min-width: 300px;
   padding: 2rem;
-  margin: 3rem auto;
-  border: 1px gray;
-  border-radius: 8px;
-  background-color: var(--salmon);
+  border-radius: 16px;
+  background-color: white;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  box-sizing: border-box;
 }
 
-.logo-container {
-  top: 5px;
-  left: 5px;
-  align-items: center;
+.card input,
+.card button {
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 12px;
+  box-sizing: border-box;
 }
 
-/* Text input styles */
-input {
-  margin: 2px;
+.card input {
+  border: 1px solid #ccc;
+}
+
+.card button {
+  border: none;
+  cursor: pointer;
+  background-color: var(--pumpkin);
+  color: white;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.card button:hover {
+  background-color: #e66b1d;
+}
+
+.ParentOrStudentToggle {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.ParentOrStudentToggle button {
+  flex: 1;
+  background-color: #eee;
+  color: var(--spaceCadet);
+  font-weight: bold;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 12px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.ParentOrStudentToggle button:hover {
+  background-color: var(--celadon);
+  color: var(--spaceCadet);
+}
+
+.ParentOrStudentToggle button.active {
+  background-color: var(--pumpkin);
+  color: white;
+}
+
+.card p[style*="color: red"] {
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 500px) {
+  .card {
+    width: 95%;
+    padding: 1.5rem;
+  }
 }
