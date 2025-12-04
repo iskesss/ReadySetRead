@@ -1,18 +1,85 @@
+/* playing around still here with what is working with colors and sizes can be changed if someone is inspired*/
 .layout-box {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 16px;
 }
 
 .answer-container {
-    width: 50%;
-    display: flex;
-    flex-direction: column;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px; 
 }
 
-.answer-container {
-    display: flex;
-    flex-direction: column;
+.quiz-progress-bar {
+  width: 50%;               
+  height: 10px;
+  background: #f3d2c1;      
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.quiz-progress-fill {
+  height: 100%;
+  background: blue;      
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.quiz-question-box {
+  width: 100%;
+  max-width: 900px; 
+  padding: 40px 48px;
+  border-radius: 16px;
+
+  background: #ffffff;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.quiz-question-box p {
+  font-size: 1.7rem;      
+  line-height: 1.5;
+  margin: 0;
+  font-weight: 500;
+}
+
+.quiz-question-box h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  opacity: .7;
+  margin: 0;
+}
+
+.answer-button {
+  width: 100%;
+  background: #1E1B4B;
+  color: white;
+  border: none;
+  box-shadow: none !important;
+
+  border-radius: 20px;
+  height: 58px;
+  font-size: 1rem;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s;
+}
+
+.answer-button:hover {
+  transform: translateY(-2px);
+  background-color: orange;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
 }
