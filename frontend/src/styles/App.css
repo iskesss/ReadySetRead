@@ -27,7 +27,7 @@ html, body {
   min-height: 100vh;
   width: 100%;
   padding: 2rem 1rem;
-  background: linear-gradient(105deg, var(--celadon), var(--pumpkin));
+  /*background: linear-gradient(105deg, var(--celadon), var(--pumpkin));*/
   box-sizing: border-box;
 }
 
@@ -109,11 +109,4 @@ html, body {
 
 .card p[style*="color: red"] {
   margin-bottom: 1rem;
-}
-
-@media (max-width: 500px) {
-  .card {
-    width: 95%;
-    padding: 1.5rem;
-  }
 }

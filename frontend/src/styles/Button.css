@@ -1,9 +1,9 @@
 .btn {
   margin: 3px;
   padding: 0.75rem;
-  width: 100%;           /* remove or adjust if you don't want full‑width everywhere */
-  border-radius: 12px;   /* match login card buttons */
-  background-color: var(--spaceCadet);  /* same blue as login */
+  width: 100%;          
+  border-radius: 12px;   
+  background-color: var(--spaceCadet) !important;; 
   color: white;
   cursor: pointer;
   border: none;
@@ -14,5 +14,5 @@
 }
 
 .btn:hover {
-  background-color: #1b315e;  /* slightly darker blue */
+  background-color: #1b315e; 
 }
