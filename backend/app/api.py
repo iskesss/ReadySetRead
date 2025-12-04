@@ -37,6 +37,7 @@ class ChildOut(BaseModel):
     child_name: str
     num_coins: int
     adult_email: EmailStr
+    bg_skin: str = "default"
 
 class AdultLogin(BaseModel):
     adult_email: EmailStr
@@ -134,6 +135,12 @@ class SpendCoinsResponse(BaseModel):
     remaining_coins: int
     message: str
 
+class GetBackgroundSkinResponse(BaseModel):
+    bg_skin: str
+
+class UpdateBackgroundSkinRequest(BaseModel):
+    new_skin: str = Field(max_length=16, description="Background skin identifier")
+
 # JWT AUTHENTICATION HELPER FUNCTIONS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
 BCRYPT_ROUNDS = int(os.getenv("BCRYPT_ROUNDS", "12"))
@@ -210,7 +217,7 @@ async def _get_current(request: Request, expect_role: Literal["adult","child"]):
                 except (TypeError, ValueError):
                     raise HTTPException(status_code=401, detail="Invalid token")
                 await db_cursor.execute(
-                    f"SELECT child_id, child_name, num_coins, adult_email FROM {CHILDREN_TABLE} WHERE child_id = %s", (child_id,)
+                    f"SELECT child_id, child_name, num_coins, adult_email, bg_skin FROM {CHILDREN_TABLE} WHERE child_id = %s", (child_id,)
                 )
                 row = await db_cursor.fetchone() # grab the first row matching the conditions we specified in the earlier execute() call. this is where we actually pull it into Python
                 if not row:
@@ -295,7 +302,7 @@ async def list_children_for_adult(adult_email: EmailStr, current: AdultOut = Dep
 
             await db_cursor.execute(
                 f"""
-                SELECT child_id, child_name, num_coins, adult_email
+                SELECT child_id, child_name, num_coins, adult_email, bg_skin
                 FROM {CHILDREN_TABLE}
                 WHERE adult_email = %s
                 ORDER BY child_name
@@ -334,7 +341,7 @@ async def child_signup(payload: ChildSignup):
                 f"""
                 INSERT INTO {CHILDREN_TABLE} (child_name, password_hash, adult_email)
                 VALUES (%s, %s, %s)
-                RETURNING child_id, child_name, num_coins, adult_email
+                RETURNING child_id, child_name, num_coins, adult_email, bg_skin
                 """,
                 (payload.child_name, hpin, payload.adult_email)
             )
@@ -749,4 +756,40 @@ async def spend_coins(
                 remaining_coins=new_balance,
                 message=f"You have successfully spent {payload.coins_to_spend} coins!"
             )
+
+# BACKGROUND SKIN ENDPOINTS
+# —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
+@router.get("/child/background-skin", response_model=GetBackgroundSkinResponse)
+async def get_background_skin(
+    current_child: ChildOut = Depends(get_current_child)
+):
+    """this endpoint gets the current bg skin for the authenticated child."""
+    return GetBackgroundSkinResponse(bg_skin=current_child.bg_skin)
+
+@router.post("/child/background-skin", response_model=GetBackgroundSkinResponse)
+async def update_background_skin(
+    payload: UpdateBackgroundSkinRequest,
+    current_child: ChildOut = Depends(get_current_child)
+):
+    """this endpoint updates the bg skin for the authenticated child."""
+    pool = require_pool()
+    async with pool.connection() as db_connection:
+        db_connection.row_factory = dict_row
+        async with db_connection.cursor() as db_cursor:
+            await db_cursor.execute(
+                f"""
+                UPDATE {CHILDREN_TABLE}
+                SET bg_skin = %s
+                WHERE child_id = %s
+                RETURNING bg_skin
+                """,
+                (payload.new_skin, current_child.child_id)
+            )
+            row = await db_cursor.fetchone()
+            if not row:
+                raise HTTPException(status_code=500, detail="Failed to update background skin")
+
+            await db_connection.commit()
+
+            return GetBackgroundSkinResponse(bg_skin=row["bg_skin"])
 
