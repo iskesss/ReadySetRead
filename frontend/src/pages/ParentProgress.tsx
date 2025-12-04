@@ -1,5 +1,5 @@
 
-import { Link, useNavigate } from 'react-router-dom';
+import {useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 //Component imports
@@ -97,7 +97,6 @@ export default function ParentProgress() {
           })}
         </div>
 
-        <Link to="/"><button className="btn logoutBtn">Log out</button></Link>
       </div>
 
       <div className="contentArea">

@@ -7,7 +7,7 @@ import { signupStudent } from '../api/students';
 
 import { Button } from "../components/button.tsx"
 
-import '../styles/Signup.css'
+import '../styles/Login_SignUp.css'
 import '../styles/App.css'
 
 export default function CreateAccount() {
@@ -16,24 +16,16 @@ export default function CreateAccount() {
   const [password, setPassword] = useState('');
   const [parentName, setParentName] = useState('');
   const [parentEmail, setParentEmail] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const idPlaceholder = signUpType === 'student' ? 'Username' : 'Email';
+  //const idPlaceholder = signUpType === 'student' ? 'Username' : 'Email';
 
   async function AfterSubmitClicked() {
-    setError('');
     setLoading(true);
 
     try {
       if (signUpType === 'student') {
-        if (!parentEmail) {
-          setError('Parent email is required for student accounts');
-          setLoading(false);
-          return;
-        }
-
         await signupStudent({
           child_name: id,
           password,
@@ -43,7 +35,6 @@ export default function CreateAccount() {
         navigate('/studentLanding');
       } else {
         if (!parentName) {
-          setError('Parent name is required');
           setLoading(false);
           return;
         }

@@ -10,7 +10,7 @@ import { loginStudent } from '../api/students';
 import { Button } from "../components/button"
 
 // Style imports
-import '../styles/Signup.css'
+import '../styles/Login_SignUp.css'
 
 export default function LoginAccount() {
     const [loginType, setloginType] = useState('student');
