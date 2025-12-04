@@ -26,7 +26,7 @@
 
 .quiz-progress-fill {
   height: 100%;
-  background: blue;      
+  background: #272558;      
   border-radius: 999px;
   transition: width 0.3s ease;
 }
@@ -35,10 +35,8 @@
   max-width: 900px; 
   padding: 40px 48px;
   border-radius: 16px;
-
   background: #ffffff;
   box-shadow: 0 8px 18px rgba(0,0,0,0.08);
-
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -56,6 +54,7 @@
   font-weight: 600;
   opacity: .7;
   margin: 0;
+  color: #1E1B4B;
 }
 
 .answer-button {
@@ -80,6 +79,6 @@
 
 .answer-button:hover {
   transform: translateY(-2px);
-  background-color: orange;
+  background-color: #ffb470;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
 }
