@@ -142,7 +142,7 @@ export default function ParentProgress() {
         </div>
 
         <div className="booksCard">
-          <h2> Books: </h2>
+          <h2> Books completed: </h2>
           <div className="bookList">
             {bookAssignments.map(assignment => {
               // Find the corresponding book using book_id
