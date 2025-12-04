@@ -106,6 +106,11 @@ class QuizOut(BaseModel):
     score: int
     feedback: str
 
+
+class QuizFeedbackOut(BaseModel):
+    quiz_id: int
+    feedback: str
+
 class QuizUpdateOut(BaseModel): #Same as quizOut but with num coins earned
     quiz_out: QuizOut
     coinsEarned: int
@@ -447,7 +452,8 @@ async def assign_quiz(
             if not row:
                 raise HTTPException(status_code=500, detail="Failed to create quiz assignment")
 
-            return QuizOut(**row)
+            return QuizOut(**row) # ** casts the DB row dictionary into a pydantic-validated AdultOut class
+
 
 @router.get("/child/{child_id}/quizzes", response_model=list[QuizOut])
 async def list_quizzes_for_child(
@@ -487,6 +493,33 @@ async def list_quizzes_for_child(
             )
             rows = await db_cursor.fetchall()
             return [QuizOut(**row) for row in rows]
+
+
+@router.get("/quiz/{quiz_id}/feedback", response_model=QuizFeedbackOut)
+async def get_quiz_feedback(quiz_id, current_user): 
+    #return stored feedback for a quiz. adults can only access feedback for their own children, and children can only access their own quizzes
+    pool = require_pool()
+    async with pool.connection() as db_connection:
+        db_connection.row_factory = dict_row
+        async with db_connection.cursor() as db_cursor:
+            await db_cursor.execute(f"SELECT quiz_id, child_id, feedback FROM {QUIZZES_TABLE} WHERE quiz_id = %s", (quiz_id,))
+            row = await db_cursor.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="quiz not found")
+
+            # making sure a child may only access their own quizzes
+            if isinstance(current_user, ChildOut):
+                if row["child_id"] != current_user.child_id:
+                    raise HTTPException(status_code=403, detail="can't view other kids quizzes!")
+                
+            # making sure if its an adult, they can only access their own child's quizzes
+            else:  
+                await db_cursor.execute(f"SELECT adult_email FROM {CHILDREN_TABLE} WHERE child_id = %s", (row["child_id"],))
+                child_row = await db_cursor.fetchone()
+                if not child_row or child_row["adult_email"] != current_user.adult_email:
+                    raise HTTPException(status_code=403, detail="you can only view your own kids quizzes!")
+
+            return QuizFeedbackOut(quiz_id=row["quiz_id"], feedback=row.get("feedback") or "")
 
 @router.post("/quiz/update", response_model=QuizUpdateOut)
 async def update_quiz_result(
