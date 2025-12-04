@@ -37,7 +37,7 @@
 }
 
 .onChildTab {
-  background-color: var(--pumpkin);
+  background-color: #ffb470;
   border-color: var(--spaceCadet);
 }
 
@@ -53,7 +53,7 @@
 /* left side of box */
 .progressCard {
   width: 60%;
-  background-color: var(--pumpkin);
+  background-color: #ffb470;
   padding: 25px;
   border-radius: 20px;
   box-sizing: border-box;
@@ -96,7 +96,7 @@
   width: 40%;
   height: 520px;
   overflow-y: auto;
-  background-color: var(--pumpkin);
+  background-color: #ffb470;
   padding: 25px;
   border-radius: 20px;
   box-sizing: border-box;
