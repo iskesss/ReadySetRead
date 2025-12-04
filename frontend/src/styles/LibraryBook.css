@@ -1,30 +1,59 @@
 /* The grid holding library book cards */
 .libraryGrid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    align-items: start;
-    justify-items: stretch;
-    width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  width: 100%;
 }
-
 
 /* An individual book card */
 .libraryBookCard {
-    padding: 1.5rem;
-    margin: 0;
-    border: 1px solid gray;
-    border-radius: 8px;
-    background-color: var(--salmon);
-    display: flex;
-    flex-direction: column;
-    align-items: left;
-    text-align: left;
-    height: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  height: 320px;
+  padding: 24px;
+  background: linear-gradient(135deg, #ffb470, #ffa157);
+  border-radius: 20px;
+  border: none;
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
 
-    .progressReportCard {
+.libraryBookCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+}
+
+/*this is a little weird it worked when i tried it so im gonna keep it unless otherwise specified*/
+.libraryBookCard h1,
+.libraryBookCard h2,
+.libraryBookCard h3 {
+  font-size: 2.1rem !important;
+  line-height: 1.25 !important;
+  margin-bottom: 18px !important;
+  font-weight: 700 !important;
+  color: #1E1B4B !important;
+}
+
+.libraryBookCard p {
+  font-size: 1.3rem !important; 
+  line-height: 1.4 !important;
+  margin: 8px 0 !important;
+  color: #1E1B4B !important;
+  opacity: 0.95;
+  font-weight: 500;
+}
+
+.libraryBookCard button {
+  margin-top: auto;
+}
+/*working on this still needs some love */
+.progressReportCard {
   flex: 1;
-  background: #ffffff;
+  background: none;
   border-radius: 12px;
   padding: 16px 20px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
@@ -37,4 +66,9 @@
   gap: 8px;
 }
 
+/* incomplete book changes background in both lib and homepage not sure if this works will check when backend is done */
+.incompleteCard {
+  background: linear-gradient(135deg, #ffd28a, #ffb66b) !important;
+  outline-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 6px 18px rgba(255, 140, 0, 0.3);
 }

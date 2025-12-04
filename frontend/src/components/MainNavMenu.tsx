@@ -48,44 +48,18 @@ export default function NavMenu({ userType }: NavMenuProps) {
     }
     navigate(link.path);
   };
-
+//moved the design stuff into the css file it was not working in file
   return (
-    <header
-      style={{
-        width: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "12px 24px",
-        borderBottom: "1px solid #ddd",
-        background: "#fef6e4",
-        boxSizing: "border-box",
-        zIndex: 10,
-        borderRadius: "12px",
-      }}
-    >
+    <header className="main-nav">
+
       <button
         type="button"
         onClick={() => navigate(homePath)}
-        style={{
-          border: "none",
-          background: "none",
-          padding: 0,
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-        }}
+        className="nav-logo-button"
       >
-        <img src={logo} alt="ReadySetRead" style={{ height: 80 }} />
+        <img src={logo} alt="ReadySetRead" className="nav-logo" />
       </button>
-
-      <nav
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "24px",
-        }}
-      >
+      <nav className="nav-links">
         {links.map((link) => (
           <button
             key={link.name}
@@ -97,11 +71,7 @@ export default function NavMenu({ userType }: NavMenuProps) {
           </button>
         ))}
 
-        <button
-          type="button"
-          onClick={logout}
-          className="nav-link"
-        >
+        <button type="button" onClick={logout} className="nav-link">
           Logout
         </button>
       </nav>

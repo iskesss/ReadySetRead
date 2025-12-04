@@ -1,7 +1,7 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { generateQuiz } from '../api/quiz';
-import '../styles/LibraryBook.css'; 
+import '../styles/LibraryBook.css';
 
 //Component Imports
 import StudentLandingBook from '../components/StudentLandingBook';
@@ -12,167 +12,169 @@ import { getAllBooks } from '../api/books';
 import type { Assignment, Book } from '../api/types';
 
 type BookType = {
-    title: string;
-    status: 'passed' | 'incomplete';
-    level: number;
+  title: string;
+  status: 'passed' | 'incomplete';
+  level: number;
+  quiz_id: number;
 };
 
 export default function StudentLandingPage() {
-    const navigate = useNavigate();
-    const [myId, setMyId] = useState<number | null>(null)
-    const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
-    const [quizError, setQuizError] = useState<string | null>(null);
-    const [studentAssignments, setStudentAssignments] = useState<Assignment[]>([])
-    const [books, setBooks] = useState<Book[]>([])
+  const navigate = useNavigate();
+  const [myId, setMyId] = useState<number | null>(null)
+  const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
+  const [quizError, setQuizError] = useState<string | null>(null);
+  const [studentAssignments, setStudentAssignments] = useState<Assignment[]>([])
+  const [books, setBooks] = useState<Book[]>([])
 
-    // ON PAGE LOAD: Get my Id
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const result = await getCurrentStudent()
-                setMyId(result.child_id)
-            } catch (error) {
-                console.error('Error getting quiz assignments: ', error)
-            }
-        }
-        fetchData()
-    }, [])
-
-    // ON PAGE LOAD: Get all of this student's quiz assignments
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                if (myId != null) {
-                    const result = await listAllQuizAssignments(myId)
-                    setStudentAssignments(result)
-                }
-            } catch (error) {
-                console.error('Error getting quiz assignments: ', error)
-            }
-        }
-        fetchData()
-    }, [myId])
-
-    // ON PAGE LOAD: Get all books, for reference by assignments to get book information
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const result = await getAllBooks()
-                setBooks(result)
-            } catch (error) {
-                console.error('Error getting all books: ', error)
-            }
-        }
-        fetchData()
-    }, [])
-
-    async function takeQuiz(book: BookType) {
-        try {
-            setIsGeneratingQuiz(true);
-            setQuizError(null);
-
-            const quizData = await generateQuiz({
-                book_title: book.title,
-                author: 'J.K. Rowling',
-                reading_level: book.level.toString(),
-                num_questions: 10,
-            });
-
-            navigate('/quiz', {
-                state: { quizData }
-            });
-        } catch (error) {
-            console.log(error)
-            setQuizError("Failed to generate quiz. Please try again.");
-            setIsGeneratingQuiz(false);
-        }
+  // ON PAGE LOAD: Get my Id
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await getCurrentStudent()
+        setMyId(result.child_id)
+      } catch (error) {
+        console.error('Error getting quiz assignments: ', error)
+      }
     }
+    fetchData()
+  }, [])
 
-    async function navToLibrary() {
-        try {
-            const result = await getCurrentStudent();
-            const student_id = result.child_id;
-            sessionStorage.setItem('targetStudentId', JSON.stringify(student_id));
-            sessionStorage.setItem('meType', JSON.stringify('student'));
-            navigate('/library');
-        } catch (error) {
-            console.log(error)
-            return
+  // ON PAGE LOAD: Get all of this student's quiz assignments
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (myId != null) {
+          const result = await listAllQuizAssignments(myId)
+          setStudentAssignments(result)
         }
+      } catch (error) {
+        console.error('Error getting quiz assignments: ', error)
+      }
     }
+    fetchData()
+  }, [myId])
 
-    const passedCount = studentAssignments.filter(a => a.passed).length;
-    const incompleteCount = studentAssignments.filter(a => !a.passed).length;
+  // ON PAGE LOAD: Get all books, for reference by assignments to get book information
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await getAllBooks()
+        setBooks(result)
+      } catch (error) {
+        console.error('Error getting all books: ', error)
+      }
+    }
+    fetchData()
+  }, [])
 
-return (
-  <div className="studentLandingContainer">
-    <div
-      style={{
-        display: "flex",
-        gap: "24px",
-        alignItems: "flex-start",
-        marginTop: "24px",
-      }}
-    >
-      {/* left: books using existing libraryGrid CSS */}
-      <div style={{ flex: 3 }}>
-        <div className="libraryGrid">
-          {studentAssignments.map((assignment) => {
-            const book = books?.find(
-              (b) => parseInt(b.book_id) === assignment.book_id
-            );
+  async function takeQuiz(book: BookType) {
+    try {
+      setIsGeneratingQuiz(true);
+      setQuizError(null);
 
-            if (!book) {
-              console.log(
-                "No book found for assignment book_id:",
-                assignment.book_id
-              );
-              return null;
-            }
+      const quizData = await generateQuiz({
+        book_title: book.title,
+        author: 'J.K. Rowling',
+        reading_level: book.level.toString(),
+        num_questions: 10,
+      });
+      const quiz_id = book.quiz_id
+      navigate('/quiz', {
+        state: { quizData, quiz_id }
+      });
+    } catch (error) {
+      console.log(error)
+      setQuizError("Failed to generate quiz. Please try again.");
+      setIsGeneratingQuiz(false);
+    }
+  }
 
-            const bookWithStatus: BookType = {
-              title: book.title,
-              status: assignment.passed ? "passed" : "incomplete",
-              level: book.reading_level,
-            };
+  async function navToLibrary() {
+    try {
+      const result = await getCurrentStudent();
+      const student_id = result.child_id;
+      sessionStorage.setItem('targetStudentId', JSON.stringify(student_id));
+      sessionStorage.setItem('meType', JSON.stringify('student'));
+      navigate('/library');
+    } catch (error) {
+      console.log(error)
+      return
+    }
+  }
 
-            return (
-              <StudentLandingBook
-                key={assignment.quiz_id}
-                title={bookWithStatus.title}
-                status={bookWithStatus.status}
-                level={bookWithStatus.level}
-                onTakeQuiz={() => takeQuiz(bookWithStatus)}
-                isGeneratingQuiz={isGeneratingQuiz}
-              />
-            );
-          })}
-        </div>
-      </div>
+  const passedCount = studentAssignments.filter(a => a.passed).length;
+  const incompleteCount = studentAssignments.filter(a => !a.passed).length;
 
-      {/* right: progress card only on this page */}
+  return (
+    <div className="studentLandingContainer">
       <div
-        className="progressReportCard"
+        style={{
+          display: "flex",
+          gap: "24px",
+          alignItems: "flex-start",
+          marginTop: "24px",
+        }}
       >
-        <h2>Progress Report</h2>
-        <div className="progressStats">
-          <div>{passedCount} passed</div>
-          <div>{incompleteCount} incomplete</div>
+        {/* left: books using existing libraryGrid CSS */}
+        <div style={{ flex: 3 }}>
+          <div className="libraryGrid">
+            {studentAssignments.map((assignment) => {
+              const book = books?.find(
+                (b) => parseInt(b.book_id) === assignment.book_id
+              );
+
+              if (!book) {
+                console.log(
+                  "No book found for assignment book_id:",
+                  assignment.book_id
+                );
+                return null;
+              }
+
+              const bookWithStatus: BookType = {
+                title: book.title,
+                status: assignment.passed ? "passed" : "incomplete",
+                level: book.reading_level,
+                quiz_id: assignment.quiz_id,
+              };
+
+              return (
+                <StudentLandingBook
+                  key={assignment.quiz_id}
+                  title={bookWithStatus.title}
+                  status={bookWithStatus.status}
+                  level={bookWithStatus.level}
+                  onTakeQuiz={() => takeQuiz(bookWithStatus)}
+                  isGeneratingQuiz={isGeneratingQuiz}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* right: progress card only on this page */}
+        <div
+          className="progressReportCard"
+        >
+          <h2>Progress Report</h2>
+          <div className="progressStats">
+            <div>{passedCount} passed</div>
+            <div>{incompleteCount} incomplete</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    {isGeneratingQuiz && (
-      <div className="loading-message">
-        <p>Please wait while we generate your quiz...</p>
-      </div>
-    )}
-    {quizError && (
-      <div className="error-message">
-        <p style={{ color: "red" }}>{quizError}</p>
-      </div>
-    )}
-  </div>
-);
+      {isGeneratingQuiz && (
+        <div className="loading-message">
+          <p>Please wait while we generate your quiz...</p>
+        </div>
+      )}
+      {quizError && (
+        <div className="error-message">
+          <p style={{ color: "red" }}>{quizError}</p>
+        </div>
+      )}
+    </div>
+  );
 
 }

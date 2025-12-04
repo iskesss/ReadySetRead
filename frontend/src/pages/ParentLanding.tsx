@@ -23,51 +23,48 @@ export default function ParentLandingPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await getMe()
-        console.log("retrieved me successfully: ", result.adult_name)
-        setMe(result.adult_email)
+        const result = await getMe();
+        console.log('retrieved me successfully: ', result.adult_name);
+        setMe(result.adult_email);
       } catch (error) {
-        console.error('Error with me api call: ', error)
+        console.error('Error with me api call: ', error);
       }
-    }
-    fetchData()
-  })
-
+    };
+    fetchData();
+  }, []);
 
   // ON PAGE LOAD: get this parent's children
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await getStudents()
-        setStudents(result)
+        const result = await getStudents();
+        setStudents(result);
       } catch (error) {
-        console.error('Error getting list of students: ', error)
+        console.error('Error getting list of students: ', error);
       }
-    }
+    };
 
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   return (
-    //CONNECT TO BACKEND:CHILDREN NAME(S) & # cards displayed (edge case to add child?)
-    //must also add links to each specific child's progress page
+        //CONNECT TO BACKEND:CHILDREN NAME(S) & # cards displayed (edge case to add child?)
+        //must also add links to each specific child's progress page
 
     <div className='parentLandingContainer'>
+      <h1 className="parentWelcome">Welcome, {me}!</h1>
 
-      <div className='header'>
+      <div className="studentList">
+        {students.map((student) => (
+          <div className="studentCard" key={student.child_id}>
+            <div className="childName">{student.child_name}</div>
 
-        <h1> Welcome, {me}!</h1>
+            <Link to="/ParentProgress">
+              <Button className="viewProgressBtn">View Progress</Button>
+            </Link>
+          </div>
+        ))}
       </div>
-
-      {students.map((option) => (
-        <div className="card studentCard">
-          <div className='childName'> {option.child_name} </div>
-          <Link to="/ParentProgress">
-            <Button className=' btn viewProgress'> View Progress </Button>
-          </Link>
-        </div>
-      ))}
-
     </div>
   );
 }
