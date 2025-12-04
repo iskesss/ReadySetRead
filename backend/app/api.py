@@ -106,10 +106,13 @@ class QuizOut(BaseModel):
     score: int
     feedback: str
 
+class QuizUpdateOut(BaseModel): #Same as quizOut but with num coins earned
+    quiz_out: QuizOut
+    coinsEarned: int
+
 class UpdateQuizRequest(BaseModel):
     quiz_id: int
     score: int = Field(ge=0, le=10, description="Quiz score from 0 to 10")
-
 # JWT AUTHENTICATION HELPER FUNCTIONS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
 BCRYPT_ROUNDS = int(os.getenv("BCRYPT_ROUNDS", "12"))
@@ -469,7 +472,7 @@ async def list_quizzes_for_child(
             rows = await db_cursor.fetchall()
             return [QuizOut(**row) for row in rows]
 
-@router.post("/quiz/update", response_model=QuizOut)
+@router.post("/quiz/update", response_model=QuizUpdateOut)
 async def update_quiz_result(
     payload: UpdateQuizRequest,
     current_child: ChildOut = Depends(get_current_child)
@@ -532,5 +535,5 @@ async def update_quiz_result(
             # commit the transaction to the DB
             await db_connection.commit()
 
-            return QuizOut(**updated_quiz)
+            return QuizUpdateOut(quizOut=QuizOut(**updated_quiz), coinsEarned=coins_to_add)
 

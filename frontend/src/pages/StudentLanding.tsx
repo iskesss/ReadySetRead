@@ -1,7 +1,7 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { generateQuiz } from '../api/quiz';
-import '../styles/LibraryBook.css'; 
+import '../styles/LibraryBook.css';
 
 //Component Imports
 import StudentLandingBook from '../components/StudentLandingBook';
@@ -15,6 +15,7 @@ type BookType = {
     title: string;
     status: 'passed' | 'incomplete';
     level: number;
+    quiz_id: number;
 };
 
 export default function StudentLandingPage() {
@@ -77,9 +78,9 @@ export default function StudentLandingPage() {
                 reading_level: book.level.toString(),
                 num_questions: 10,
             });
-
+            const quiz_id = book.quiz_id
             navigate('/quiz', {
-                state: { quizData }
+                state: { quizData, quiz_id }
             });
         } catch (error) {
             console.log(error)
@@ -123,7 +124,8 @@ export default function StudentLandingPage() {
                     const bookWithStatus: BookType = {
                         title: book.title,
                         status: assignment.passed ? 'passed' : 'incomplete',
-                        level: book.reading_level
+                        level: book.reading_level,
+                        quiz_id: assignment.quiz_id
                     };
 
                     return (

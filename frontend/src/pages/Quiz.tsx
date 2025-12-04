@@ -11,12 +11,13 @@ import '../styles/Quiz.css'
 
 // API imports
 import type { QuizResponse } from '../api/types';
-
+import { updateQuiz } from '../api/quiz';
 
 export default function Quiz() {
 
     const location = useLocation();
     const { quizData } = location.state as { quizData: QuizResponse };
+    const { quiz_id } = location.state as { quiz_id: number }
     const navigate = useNavigate();
 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -26,16 +27,21 @@ export default function Quiz() {
     const currentQuestion = quizData.questions[currentQuestionIndex];
     const isLastQuestion = currentQuestionIndex === quizData.questions.length - 1
 
-    const handleAnswerClick = (selectedOption: string) => {
+    const handleAnswerClick = async (selectedOption: string) => {
         if (selectedOption == quizData.questions[currentQuestionIndex].correct_answer) {
             const newScore = score + 1;
             setScore(newScore);
 
             if (isLastQuestion) {
+                //Wait for quiz completion data to be sent
+                await sendQuizUpdate(newScore)
+                // TODO: SEND ANSWERS FOR FEEDBACK HERE
+
+                //Navigate to results page once backend update is done
                 navigate('/quizResults', {
                     state: {
                         quizData: quizData,
-                        score: newScore  // Use the new score here
+                        score: newScore
                     }
                 })
             } else {
@@ -50,6 +56,18 @@ export default function Quiz() {
     const handleNextClicked = () => {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
         setShowResults(false)
+    }
+
+    async function sendQuizUpdate(newScore: number) {
+        try {
+            const payload = { //Replicate the UpdateQuizRequest type
+                quiz_id: quiz_id,
+                score: newScore
+            }
+            updateQuiz(payload)
+        } catch (error) {
+            console.log("Error sending quiz results to backend: ", error)
+        }
     }
 
     return (

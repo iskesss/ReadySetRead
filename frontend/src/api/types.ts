@@ -1,4 +1,7 @@
+// =============================
 // API Request Types
+// =============================
+
 export interface ParentSignupRequest {
   adult_email: string;
   password: string;
@@ -37,7 +40,15 @@ export interface AssignQuizRequest {
   book_id: number
 }
 
+export interface UpdateQuizRequest {
+  quiz_id: number
+  score: number
+}
+
+// =============================
 // API Response Types
+// =============================
+
 export interface ParentResponse {
   adult_email: string;
   adult_name: string | null;
@@ -96,6 +107,11 @@ export interface Assignment { //Corresponds to QuizOut in backend
   score: number;
   feedback: string;
   qna: string;
+}
+
+export interface UpdateQuizResponse {
+  quiz_out: Assignment;
+  coinsEarned: number;
 }
 
 // Error Response Type
