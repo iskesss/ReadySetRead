@@ -125,6 +125,11 @@ class UpdateQuizFeedbackRequest(BaseModel):
     quiz_questions: GenerateQuizResponse  # The full quiz with 10 questions
     child_responses: list[str] = Field(min_length=10, max_length=10, description="Child's 10 responses to the quiz questions")
 
+class QuizStatsOut(BaseModel):
+    failed: int
+    passed: int
+    not_attempted: int
+
 # COINS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
 class SpendCoinsRequest(BaseModel):
@@ -502,6 +507,60 @@ async def list_quizzes_for_child(
             return [QuizOut(**row) for row in rows]
 
 
+@router.get("/child/{child_id}/quiz-stats", response_model=QuizStatsOut)
+async def get_quiz_stats_for_child(
+    child_id: int,
+    current_user: AdultOut | ChildOut = Depends(get_current_user)
+):
+    #quiz stats for a child: count of failed, passed, and not attempted quizzes
+    
+    pool = require_pool()
+    async with pool.connection() as db_connection:
+        db_connection.row_factory = dict_row
+        async with db_connection.cursor() as db_cursor:
+            await db_cursor.execute(
+                f"SELECT child_id, adult_email FROM {CHILDREN_TABLE} WHERE child_id = %s",
+                (child_id,)
+            )
+            child_row = await db_cursor.fetchone()
+            if not child_row:
+                raise HTTPException(status_code=404, detail="Child not found!")
+
+            if isinstance(current_user, ChildOut):
+                if current_user.child_id != child_id:
+                    raise HTTPException(status_code=403, detail="You can't view other kids' quiz stats!")
+            elif isinstance(current_user, AdultOut):
+                if current_user.adult_email != child_row["adult_email"]:
+                    raise HTTPException(status_code=403, detail="You can only view your own kids' quiz stats!")
+
+            # count failed quizzes (attempted but not passed)
+            await db_cursor.execute(
+                f"SELECT COUNT(*) FROM {QUIZZES_TABLE} WHERE child_id = %s AND attempted = true AND passed = false",
+                (child_id,)
+            )
+            failed = (await db_cursor.fetchone())[0]
+            
+            # count passed quizzes
+            await db_cursor.execute(
+                f"SELECT COUNT(*) FROM {QUIZZES_TABLE} WHERE child_id = %s AND passed = true",
+                (child_id,)
+            )
+            passed = (await db_cursor.fetchone())[0]
+            
+            # count not attempted quizzes
+            await db_cursor.execute(
+                f"SELECT COUNT(*) FROM {QUIZZES_TABLE} WHERE child_id = %s AND attempted = false",
+                (child_id,)
+            )
+            not_attempted = (await db_cursor.fetchone())[0]
+            
+            return QuizStatsOut(
+                failed=failed,
+                passed=passed,
+                not_attempted=not_attempted
+            )
+
+
 @router.get("/quiz/{quiz_id}/feedback", response_model=QuizFeedbackOut)
 async def get_quiz_feedback(quiz_id, current_user): 
     #return stored feedback for a quiz. adults can only access feedback for their own children, and children can only access their own quizzes
@@ -763,7 +822,7 @@ async def spend_coins(
 async def get_background_skin(
     current_child: ChildOut = Depends(get_current_child)
 ):
-    """this endpoint gets the current bg skin for the authenticated child."""
+    #this endpoint gets the current bg skin for the authenticated child
     return GetBackgroundSkinResponse(bg_skin=current_child.bg_skin)
 
 @router.post("/child/background-skin", response_model=GetBackgroundSkinResponse)
@@ -771,7 +830,7 @@ async def update_background_skin(
     payload: UpdateBackgroundSkinRequest,
     current_child: ChildOut = Depends(get_current_child)
 ):
-    """this endpoint updates the bg skin for the authenticated child."""
+    #this endpoint updates the bg skin for the authenticated child
     pool = require_pool()
     async with pool.connection() as db_connection:
         db_connection.row_factory = dict_row
