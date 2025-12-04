@@ -26,7 +26,6 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 DEFAULT_QUIZ_MODEL = "gpt-5-mini"
 
-
 def _quiz_json_schema() -> dict: #defining the JSON schema for the quiz questions
     return {
         "type": "object",
@@ -150,3 +149,123 @@ def generate_quiz_for_book(
         q.setdefault("type", "multiple_choice")                     # ensure each question has a "type" field, defaulting to "multiple_choice"
 
     return questions
+
+
+def generate_quiz_feedback(
+    *,
+    questions: List[QuizQuestionDict], # a list of quiz questions with correct answers and explanations
+    child_responses: List[str], # list of the child's responses (same order as questions)
+) -> str:
+    
+    # build a summary of the quiz results
+    results_summary = []
+    for i in range(len(questions)):
+        question = questions[i]
+        response = child_responses[i]
+        correct = question["correct_answer"]
+        is_correct = response == correct
+        results_summary.append({
+            "question_number": i + 1,  
+            "question": question["question"],
+            "correct_answer": correct,
+            "child_answer": response,
+            "is_correct": is_correct,
+            "explanation": question.get("explanation", "")
+        })
+
+    # count correct answers
+    num_correct = 0
+    for r in results_summary:
+        if r["is_correct"]:
+            num_correct += 1
+
+    total_questions = len(questions)
+
+    # build prompt for feedback generation
+    system_prompt = (
+        "You are a kind but honest reading tutor for elementary school students "
+        "(grades K-6).\n\n"
+        "You will be given:\n"
+        "- quiz_json: an object with a 'questions' array. Each question has:\n"
+        "  - id: string\n"
+        "  - type: 'multiple_choice'\n"
+        "  - question: string\n"
+        "  - options: array of exactly 4 answer choices (strings)\n"
+        "  - correct_answer: the correct option text (string)\n"
+        "  - explanation: a short explanation of the correct answer\n"
+        "- student_answers: an array of strings representing the student's answers, "
+        "  in the SAME order as quiz_json.questions.\n\n"
+        "Interpreting answers:\n"
+        "- If a student answer exactly matches one of the option texts, compare it "
+        "  directly to 'correct_answer'.\n"
+        "- If a student answer is a single letter like 'A', 'B', 'C', or 'D', treat "
+        "  it as choosing options[0], options[1], options[2], or options[3].\n"
+        "- Mark each question as correct or incorrect based on this comparison.\n\n"
+        "Your job is to generate brief feedback for the student that:\n"
+        "- Speaks directly to the student in a friendly, encouraging tone.\n"
+        "- Is honest about what they need to improve, but never harsh or discouraging.\n"
+        "- Focuses mostly on patterns in what they got WRONG (for example, trouble "
+        "  with figuring out why characters did things, understanding how events are "
+        "  connected, remembering details about characters or places, or understanding "
+        "  the big lesson/theme).\n"
+        "- Also briefly mentions 1-2 things they did WELL (for example, remembering "
+        "  key events, understanding the main problem and solution, or knowing what "
+        "  happened first/next/last).\n"
+        "- Uses simple, age-appropriate language for K-6 students.\n"
+        "- Avoids repeating every question or listing each missed question by number. "
+        "  Instead, summarize the main patterns you see.\n\n"
+        "Feedback content guidelines:\n"
+        "- Start with a short positive opening that praises the student's effort and, "
+        "  if possible, mentions how many they got right out of the total.\n"
+        "- In 2-4 sentences, explain what the student needs to work on, based on the "
+        "  types of questions they missed. Use clear, kid-friendly language about "
+        "  skills like:\n"
+        "  - remembering facts from the story\n"
+        "  - understanding why something happened (cause and effect)\n"
+        "  - paying attention to how characters feel or what they learn\n"
+        "  - noticing how the story changes from the beginning to the end\n"
+        "- Include 1-3 simple, concrete suggestions the student can try next time "
+        "  (for example: \"slow down and reread the part where the problem gets "
+        "  solved,\" \"pay attention to how the main character is feeling,\" or "
+        "  \"look back at earlier pages if you forget why something happened\").\n"
+        "- End with a short, encouraging closer that reinforces a growth mindset, "
+        "  such as reminding them that they can improve with practice.\n\n"
+        "Style and format:\n"
+        "- Write as if you are talking directly to the student (use \"you\").\n"
+        "- Keep sentences short and clear.\n"
+        "- You may use short paragraphs or bullet points, but the entire response "
+        "  must be plain text (a single long string), not JSON.\n"
+        "- Do not mention that you are an AI or reference the quiz JSON structure; "
+        "  just give the feedback.\n"
+    )
+
+    # format the results for the LLM
+    results_text = f"The child answered {num_correct} out of {total_questions} questions correctly.\n\nHere are the details:\n\n"
+
+    for r in results_summary:
+        status = "Correct" if r["is_correct"] else "Incorrect"
+        results_text += f"Question {r['question_number']}: {status}\n"
+        results_text += f"  Q: {r['question']}\n"
+        results_text += f"  Child's answer: {r['child_answer']}\n"
+        results_text += f"  Correct answer: {r['correct_answer']}\n"
+        if r.get("explanation"):
+            results_text += f"  Explanation: {r['explanation']}\n"
+        results_text += "\n"
+
+    user_message = (
+        f"{results_text}\n"
+        "Based on these results, generate feedback for the child."
+    )
+
+    # call OpenAI to generate feedback
+    response = client.chat.completions.create(
+        model=DEFAULT_QUIZ_MODEL,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_message},
+        ],
+        max_tokens=250, # keeps feedback concise enough to fit in our PostgreSQL DB
+    )
+
+    feedback = response.choices[0].message.content.strip()
+    return feedback # returns string of feedback

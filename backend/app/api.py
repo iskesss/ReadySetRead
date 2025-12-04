@@ -8,7 +8,7 @@ from jose import jwt, JWTError
 import bcrypt
 from psycopg.rows import dict_row
 from . import db
-from .quiz_llm import generate_quiz_for_book
+from .quiz_llm import generate_quiz_for_book, generate_quiz_feedback
 
 ADULTS_TABLE = db.ADULTS_TABLE
 CHILDREN_TABLE = db.CHILDREN_TABLE
@@ -109,6 +109,11 @@ class QuizOut(BaseModel):
 class UpdateQuizRequest(BaseModel):
     quiz_id: int
     score: int = Field(ge=0, le=10, description="Quiz score from 0 to 10")
+
+class UpdateQuizFeedbackRequest(BaseModel):
+    quiz_id: int
+    quiz_questions: GenerateQuizResponse  # The full quiz with 10 questions
+    child_responses: list[str] = Field(min_length=10, max_length=10, description="Child's 10 responses to the quiz questions")
 
 # COINS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
@@ -543,6 +548,63 @@ async def update_quiz_result(
             await db_connection.commit()
 
             return QuizOut(**updated_quiz)
+
+@router.post("/quiz/update-feedback")
+async def update_quiz_feedback( # generate and then store AI feedback for a quiz that a child has completed. this function does not return the feedback itself to the frontend
+    payload: UpdateQuizFeedbackRequest,
+    current_child: ChildOut = Depends(get_current_child)
+):
+    pool = require_pool()
+    async with pool.connection() as db_connection:
+        db_connection.row_factory = dict_row
+        async with db_connection.cursor() as db_cursor:
+            await db_cursor.execute(
+                f"""
+                SELECT quiz_id, child_id
+                FROM {QUIZZES_TABLE}
+                WHERE quiz_id = %s 
+                """,
+                (payload.quiz_id,)
+            )                                           
+            quiz_row = await db_cursor.fetchone()
+            if not quiz_row:
+                raise HTTPException(status_code=404, detail="Quiz not found!")
+
+            # make sure this quiz belongs to the authenticated child
+            if quiz_row["child_id"] != current_child.child_id:
+                raise HTTPException(status_code=403, detail="You can't update other kids' quizzes!")
+
+            # verify that we have exactly 10 questions and 10 responses
+            if len(payload.quiz_questions.questions) != 10:
+                raise HTTPException(
+                    status_code=422,
+                    detail="Quiz must contain exactly 10 questions"
+                )
+            if len(payload.child_responses) != 10:
+                raise HTTPException(
+                    status_code=422,
+                    detail="Must provide exactly 10 responses"
+                )
+
+            # convert pydantic models to python dictionaries  for the feedback generator
+            questions_dicts = [ q.model_dump() for q in payload.quiz_questions.questions]
+
+            # want to run generate_quiz_feedback in a separate thread pool cause it makes a synchronous openai api call and would thereby otherwise block fastapi from handling anything else
+            feedback = await asyncio.to_thread( generate_quiz_feedback, questions=questions_dicts, child_responses=payload.child_responses )
+
+            # once we recieve the feedback, we update the feedback column in db
+            await db_cursor.execute(
+                f"""
+                UPDATE {QUIZZES_TABLE}
+                SET feedback = %s
+                WHERE quiz_id = %s
+                """,
+                (feedback, payload.quiz_id)
+            )
+
+            await db_connection.commit()
+
+            return {"message": "Feedback generated and stored successfully"}
 
 # COIN SPENDING ENDPOINT
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
