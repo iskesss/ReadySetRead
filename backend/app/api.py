@@ -13,6 +13,7 @@ from .quiz_llm import generate_quiz_for_book, generate_quiz_feedback
 ADULTS_TABLE = db.ADULTS_TABLE
 CHILDREN_TABLE = db.CHILDREN_TABLE
 QUIZZES_TABLE = db.QUIZZES_TABLE
+CUSTOM_REWARDS_TABLE = db.CUSTOM_REWARDS_TABLE
 
 router = APIRouter(prefix="/v1")
 
@@ -145,6 +146,21 @@ class GetBackgroundSkinResponse(BaseModel):
 
 class UpdateBackgroundSkinRequest(BaseModel):
     new_skin: str = Field(max_length=16, description="Background skin identifier")
+
+# CUSTOM REWARDS
+# —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
+class CreateCustomRewardRequest(BaseModel):
+    child_id: int
+    description: str = Field(min_length=1, max_length=500)
+    coin_cost: int = Field(ge=0, description="Cost in coins (has to be non-negative)")
+    adult_email: EmailStr
+
+class CustomRewardOut(BaseModel):
+    reward_id: int
+    child_id: int
+    description: str
+    coin_cost: int
+    adult_email: EmailStr
 
 # JWT AUTHENTICATION HELPER FUNCTIONS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
@@ -851,4 +867,56 @@ async def update_background_skin(
             await db_connection.commit()
 
             return GetBackgroundSkinResponse(bg_skin=row["bg_skin"])
+
+# CUSTOM REWARDS ENDPOINTS
+# —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
+@router.post("/custom-rewards", response_model=CustomRewardOut, status_code=201)
+async def create_custom_reward( # create a custom reward for a child.
+    payload: CreateCustomRewardRequest,
+    current_adult: AdultOut = Depends(get_current_adult) # adult auth is important for this one
+):
+
+    # gotta verify that the adult_email from the request matches the authenticated adult
+    if current_adult.adult_email != payload.adult_email:
+        raise HTTPException(
+            status_code=403,
+            detail="You can only create rewards using your own email address!"
+        )
+
+    pool = require_pool()
+    async with pool.connection() as db_connection:
+        db_connection.row_factory = dict_row
+        async with db_connection.cursor() as db_cursor:
+            # verify that the child exists and belongs to the authenticated adult
+            await db_cursor.execute(
+                f"""SELECT child_id, adult_email FROM {CHILDREN_TABLE} 
+                WHERE child_id = %s""",
+                (payload.child_id,)
+            )
+            child_row = await db_cursor.fetchone()
+            if not child_row:
+                raise HTTPException(status_code=404, detail="Child not found!")
+
+            if child_row["adult_email"] != current_adult.adult_email:
+                raise HTTPException(
+                    status_code=403,
+                    detail="you can only create rewards for your own children..."
+                )
+
+            # upsert the custom reward
+            await db_cursor.execute(
+                f"""
+                INSERT INTO {CUSTOM_REWARDS_TABLE} (child_id, description, coin_cost, adult_email)
+                VALUES (%s, %s, %s, %s)
+                RETURNING reward_id, child_id, description, coin_cost, adult_email
+                """,
+                (payload.child_id, payload.description, payload.coin_cost, payload.adult_email)
+            )
+            row = await db_cursor.fetchone()
+            if not row:
+                raise HTTPException(status_code=500, detail="Failed to create custom reward")
+
+            await db_connection.commit()
+
+            return CustomRewardOut(**row)
 
