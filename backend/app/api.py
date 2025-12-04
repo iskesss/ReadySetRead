@@ -383,7 +383,7 @@ async def list_all_books():
         db_connection.row_factory = dict_row
         async with db_connection.cursor() as db_cursor:
             await db_cursor.execute(
-                f"SELECT book_id, title, reading_level, author FROM {db.BOOKS_TABLE}"
+                f"SELECT book_id, title, reading_level, author FROM {db.BOOKS_TABLE} ORDER BY reading_level"
             )
             rows = await db_cursor.fetchall()
             return [BookOut(**row) for row in rows]
