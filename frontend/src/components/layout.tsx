@@ -13,6 +13,9 @@ export default function Layout({ userType }: LayoutProps) {
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
+        padding: 0,          // no padding around the nav
+        margin: 0,
+        boxSizing: "border-box",
       }}
     >
       <NavMenu userType={userType} />
@@ -20,7 +23,7 @@ export default function Layout({ userType }: LayoutProps) {
       <main
         style={{
           flex: 1,
-          padding: "1.5rem 2rem",
+          padding: "1.5rem 2rem",  // content padding only
           boxSizing: "border-box",
           width: "100%",
         }}
