@@ -8,6 +8,7 @@ ADULTS_TABLE = f"{SCHEMA}.adults"
 CHILDREN_TABLE = f"{SCHEMA}.children"
 BOOKS_TABLE = f"{SCHEMA}.books"
 QUIZZES_TABLE = f"{SCHEMA}.quizzes"
+CUSTOM_REWARDS_TABLE = f"{SCHEMA}.custom_rewards"
 
 pool: AsyncConnectionPool | None = None
 
