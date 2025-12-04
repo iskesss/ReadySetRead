@@ -52,7 +52,7 @@ export default function LoginAccount() {
     }
 
     return (
-        <div className="page-background">
+        <div className="page-bkgd">
             <div className="logo-container">
                 <img src={logo} className="logo" alt="Logo" />
             </div>

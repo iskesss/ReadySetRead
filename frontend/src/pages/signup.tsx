@@ -55,7 +55,7 @@ export default function CreateAccount() {
   }
 
   return (
-    <div className="page-background">
+    <div className="page-bkgd">
       <img src={logo} className="logo" alt="Logo" />
 
       <div className="card">
