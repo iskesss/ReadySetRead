@@ -861,3 +861,42 @@ async def create_custom_reward( # create a custom reward for a child.
 
             return CustomRewardOut(**row)
 
+@router.get("/child/{child_id}/custom-rewards", response_model=list[CustomRewardOut])
+async def list_custom_rewards_for_child(
+    child_id: int,
+    current_user: AdultOut | ChildOut = Depends(get_current_user) # either adults can view their rewards assigned to a specific child, or that specific child can view the awards assigned to them
+):
+    pool = require_pool()
+    async with pool.connection() as db_connection:
+        db_connection.row_factory = dict_row
+        async with db_connection.cursor() as db_cursor:
+            # verify the child exists and also get their corresponding adultEmail
+            await db_cursor.execute(
+                f"SELECT child_id, adult_email FROM {CHILDREN_TABLE} WHERE child_id = %s",
+                (child_id,)
+            )
+            child_row = await db_cursor.fetchone()
+            if not child_row:
+                raise HTTPException(status_code=404, detail="Child not found!")
+
+            # we need to verify that kids can only view their own rewards and that adults can only view their kid's rewards
+            if isinstance(current_user, ChildOut):
+                if current_user.child_id != child_id:
+                    raise HTTPException(status_code=403, detail="You can't view other kid's' rewards!")
+            elif isinstance(current_user, AdultOut):
+                if current_user.adult_email != child_row["adult_email"]:
+                    raise HTTPException(status_code=403, detail="You can only view your own kids' rewards!")
+
+            # fetch all custom rewards for this particular child
+            await db_cursor.execute(
+                f"""
+                SELECT reward_id, child_id, description, coin_cost, adult_email
+                FROM {CUSTOM_REWARDS_TABLE}
+                WHERE child_id = %s
+                ORDER BY reward_id
+                """,
+                (child_id,)
+            )
+            rows = await db_cursor.fetchall()
+            return [CustomRewardOut(**row) for row in rows]
+
