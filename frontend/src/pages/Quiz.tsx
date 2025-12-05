@@ -112,7 +112,7 @@ export default function Quiz() {
   }
 
   return (
-    <div className='page-background'>
+    <div className='quiz-page-background'>
       <div className='layout-box'>
         <Link to='/studentLanding'>
           <Button>

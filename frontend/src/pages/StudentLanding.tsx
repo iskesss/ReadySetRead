@@ -29,9 +29,12 @@ export default function StudentLandingPage() {
   const [books, setBooks] = useState<Book[]>([])
   const [popUpOpen, setPopUpOpen] = useState(false)
   const [isLoadingAssignments, setIsLoadingAssignments] = useState(true)
+  const [isLoadingBooks, setIsLoadingBooks] = useState(true)
 
   // ON PAGE LOAD: Get my Id
   useEffect(() => {
+    // TODO: DEBUG
+    console.log(sessionStorage.getItem("token"))
     const fetchData = async () => {
       try {
         const result = await getCurrentStudent()
@@ -70,10 +73,13 @@ export default function StudentLandingPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoadingBooks(true)
         const result = await getAllBooks()
         setBooks(result)
+        setIsLoadingBooks(false)
       } catch (error) {
         console.error('Error getting all books: ', error)
+        setIsLoadingBooks(false)
       }
     }
     fetchData()
@@ -127,7 +133,7 @@ export default function StudentLandingPage() {
     <div className="studentLandingContainer">
 
       {/* popup shown when no quizzes assigned */}
-      {!isLoadingAssignments && studentAssignments.length === 0 && books.length > 0 && myId !== null && (
+      {!isLoadingAssignments && !isLoadingBooks && studentAssignments.length === 0 && books.length > 0 && myId !== null && (
         <div className="popUpOverlay">
           <div className="popUpBox emptyStatePopup">
             <h2 className="popUpText" style={{ fontSize: '28px', marginBottom: '20px' }}>

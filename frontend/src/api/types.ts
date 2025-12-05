@@ -97,6 +97,7 @@ export interface StudentResponse {
   child_name: string;
   num_coins: number;
   adult_email: string;
+  bg_skin: string;
 }
 
 export interface TokenResponse {

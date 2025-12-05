@@ -8,9 +8,9 @@ import '../styles/Rewards.css'
 import '../styles/App.css'
 
 //Api imports
-import { getNumCoins, listCustomRewards, redeemCustomReward } from "../api/rewards";
+import { getBackgroundSkin, getNumCoins, listCustomRewards, redeemCustomReward, spendCoins, updateBackgroundSkin } from "../api/rewards";
 import { getCurrentStudent } from "../api/students";
-import type { CustomReward, GetCoinsRequest, ListCustomRewardsRequest, RedeemCustomRewardRequest } from "../api/types";
+import type { CustomReward, GetCoinsRequest, ListCustomRewardsRequest, RedeemCustomRewardRequest, SpendCoinsRequest, UpdateBackgroundSkinRequest } from "../api/types";
 
 export default function Rewards() {
   const [popUpOpen, setPopUpOpen] = useState(false);
@@ -22,37 +22,29 @@ export default function Rewards() {
   const [customRewards, setCustomRewards] = useState<CustomReward[]>([])
   const [rewardRedeemed, setRewardRedeemed] = useState<boolean[]>([]);
 
+  const [selectedBackgroundPrice, setSelectedBackgroundPrice] = useState<number>()
+  const [insufficientFunds, setInsufficientFunds] = useState(false)
+
+
+  //Database for app skins here for now
   const appSkins = {
     jurassicJungle: {
       name: "Jurassic Jungle Skin",
-      cost: 10,
+      cost: 1,
       gradient: "linear-gradient(180deg, #567d46, #3b5e34, #283c22, #1e261d)"
     },
     dragonFire: {
       name: "Dragon Fire Skin",
-      cost: 10,
+      cost: 1,
       gradient: "linear-gradient(to bottom right, #3e0000, #800000, #ff4500)"
     },
     candyKingdom: {
       name: "Candy Kingdom Skin",
-      cost: 10,
+      cost: 1,
       gradient: "linear-gradient(180deg, #FF9A9E, #FECFEF, #E0C3FC)"
     }
   };
 
-  const changeSkin = (color: string) => {
-    setSelectedColor(color);
-    setPopUpOpen(true);
-  };
-
-  const yesClicked = () => {
-    setPageBackground(selectedColor); // Apply the chosen skin
-    setPopUpOpen(false);
-  };
-
-  const noClicked = () => {
-    setPopUpOpen(false);
-  };
 
   // ON PAGE LOAD: Get my Id
   useEffect(() => {
@@ -100,7 +92,21 @@ export default function Rewards() {
     fetchData()
   }, [myId])
 
-  //ON PAGE LOAD: Get num coins
+  //ON PAGE LOAD: get current background skin
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await getBackgroundSkin()
+        setPageBackground(result.bg_skin)
+        return
+      } catch (error) {
+        console.error('Error: ', error)
+      }
+    }
+    fetchData()
+  }, [])
+
+  //ON PAGE LOAD: template
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -118,12 +124,7 @@ export default function Rewards() {
     try {
       if (myId && reward_id) {
         const request: RedeemCustomRewardRequest = { child_id: myId, reward_id: reward_id }
-        const result = await redeemCustomReward(request)
-        // if (result.success) {
-        //   const request: SpendCoinsRequest = { coins_to_spend: cost }
-        //   const spendResult = await spendCoins(request)
-        //   console.log("Did we succeed spending coins: ", spendResult.message)
-        // }
+        const result = await redeemCustomReward(request) //Coins spent in this function
 
         // Update the rewardRedeemed array to re render for ui change
         setRewardRedeemed(prev => {
@@ -132,7 +133,7 @@ export default function Rewards() {
           return newRedeemed;
         });
 
-        // Update coin count
+        // Update coin count in ui
         if (result.success && result.remaining_coins !== undefined) {
           setNumCoins(result.remaining_coins);
         }
@@ -144,9 +145,49 @@ export default function Rewards() {
     }
   }
 
-  async function storeItemClicked(skinGradient: string) {
-    changeSkin(skinGradient)
+  async function yesClicked(price: number) {
+    try {
+      const spendRequest: SpendCoinsRequest = { coins_to_spend: price }
+      const result = await spendCoins(spendRequest)
+      if (result.success) {
+        const backgroundRequest: UpdateBackgroundSkinRequest = { new_skin: selectedColor }
+        const bgResult = await updateBackgroundSkin(backgroundRequest)
+        console.log("success updating app skin: ", bgResult)
+        setPageBackground(selectedColor); // apply the chosen skin
+
+        // update coin count in UI
+        if (result.remaining_coins !== undefined) {
+          setNumCoins(result.remaining_coins);
+        }
+
+        setPopUpOpen(false);
+      } else {
+        setInsufficientFunds(true);
+        setTimeout(() => {
+          setInsufficientFunds(false);
+          setPopUpOpen(false);
+        }, 2000);
+      }
+
+    } catch (error) {
+      console.log('Error updating app skin on backend: ', error)
+      setPopUpOpen(false);
+    }
+  };
+
+  const noClicked = () => {
+    setPopUpOpen(false);
+  };
+
+  async function shopItemClicked(skinGradient: string, price: number) {
+    changeSkin(skinGradient, price)
   }
+
+  const changeSkin = (color: string, price: number) => {
+    setSelectedColor(color);
+    setSelectedBackgroundPrice(price)
+    setPopUpOpen(true);
+  };
 
 
   return (
@@ -158,12 +199,17 @@ export default function Rewards() {
       {popUpOpen && (
         <div className="popUpOverlay">
           <div className="popUpBox">
-            <p>Are you sure you want to buy this app skin for 10 coins?</p>
-
-            <div className="popUpButtons">
-              <button onClick={yesClicked}>Yes</button>
-              <button onClick={noClicked}>No</button>
-            </div>
+            {insufficientFunds ? (
+              <p>Insufficient funds! You need more coins.</p>
+            ) : (
+              <>
+                <p>Are you sure you want to buy this app skin?</p>
+                <div className="popUpButtons">
+                  <button onClick={() => yesClicked(selectedBackgroundPrice ?? 0)}>Yes</button>
+                  <button onClick={noClicked}>No</button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -201,7 +247,7 @@ export default function Rewards() {
                 <Button
                   key={key}
                   className="storeItem"
-                  onClick={() => storeItemClicked(skin.gradient)}
+                  onClick={() => shopItemClicked(skin.gradient, skin.cost)}
                 >
                   {skin.name}: {skin.cost} coins
                 </Button>

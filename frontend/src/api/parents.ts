@@ -24,6 +24,8 @@ export async function loginParent(
 
     if (response.data.access_token) {
         localStorage.setItem("token", response.data.access_token);
+    } else {
+        console.log("CRITICAL ERROR GETTING TOKEN FROM LOGIN")
     }
 
     return response.data;

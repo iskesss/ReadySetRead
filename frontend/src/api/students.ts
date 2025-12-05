@@ -18,6 +18,9 @@ export async function loginStudent(
     if (response.data.access_token) {
         localStorage.setItem("token", response.data.access_token);
     }
+    else {
+        console.log("CRITICAL ERROR GETTING TOKEN FROM Login")
+    }
 
     return response.data;
 }

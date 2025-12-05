@@ -9,7 +9,9 @@ import type {
     RedeemCustomRewardRequest,
     RedeemCustomRewardResponse,
     SpendCoinsRequest,
-    SpendCoinsResponse
+    SpendCoinsResponse,
+    GetBackgroundSkinResponse,
+    UpdateBackgroundSkinRequest
 } from "./types";
 
 //Get number of coins for current child
@@ -26,7 +28,6 @@ export async function spendCoins(
     const response = await api.post<SpendCoinsResponse>('/child/spend-coins', data)
     return response.data;
 }
-
 
 //Create a new custom reward
 export async function createCustomReward(
@@ -49,5 +50,18 @@ export async function redeemCustomReward(
     data: RedeemCustomRewardRequest
 ): Promise<RedeemCustomRewardResponse> {
     const response = await api.post<RedeemCustomRewardResponse>(`/custom-rewards/redeem`, data)
+    return response.data
+}
+
+//Get currently selected background skin
+export async function getBackgroundSkin(): Promise<GetBackgroundSkinResponse> {
+    const response = await api.get<GetBackgroundSkinResponse>('/child/background-skin')
+    return response.data
+}
+
+export async function updateBackgroundSkin(
+    data: UpdateBackgroundSkinRequest
+): Promise<GetBackgroundSkinResponse> {
+    const response = await api.post('/child/background-skin', data)
     return response.data
 }

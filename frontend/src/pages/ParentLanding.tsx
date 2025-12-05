@@ -60,15 +60,19 @@ export default function ParentLandingPage() {
       <h1 className="parentWelcome">Welcome, {me}!</h1>
 
       <div className="studentList">
-        {students.map((student) => (
-          <div className="studentCard" key={student.child_id}>
-            <div className="childName">{student.child_name}</div>
+        {students.length === 0 ? (
+          <h2>No linked student accounts yet.</h2>
+        ) : (
+          students.map((student) => (
+            <div className="studentCard" key={student.child_id}>
+              <div className="childName">{student.child_name}</div>
 
-            <Link to="/ParentProgress">
-              <Button className="viewProgressBtn">View Progress</Button>
-            </Link>
-          </div>
-        ))}
+              <Link to="/ParentProgress">
+                <Button className="viewProgressBtn">View Progress</Button>
+              </Link>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

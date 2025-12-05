@@ -102,7 +102,7 @@ export default function Library() {
     }
 
     return (
-        <div className='page-background'>
+        <div className='library-wrapper'>
             <main>
                 <Button onClick={backClicked}>
                     Go back

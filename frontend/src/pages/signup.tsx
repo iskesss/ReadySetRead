@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../logo.png';
 
-import { signupParent } from '../api/parents';
-import { signupStudent } from '../api/students';
+import { signupParent, loginParent } from '../api/parents';
+import { signupStudent, loginStudent } from '../api/students';
 
 import { Button } from "../components/button.tsx"
 
@@ -32,6 +32,12 @@ export default function CreateAccount() {
           adult_email: parentEmail,
         });
 
+        // Login to get token after successful signup
+        await loginStudent({
+          child_name: id,
+          password,
+        });
+
         navigate('/studentLanding');
       } else {
         if (!parentName) {
@@ -43,6 +49,12 @@ export default function CreateAccount() {
           adult_email: id,
           password,
           adult_name: parentName,
+        });
+
+        // Login to get token after successful signup
+        await loginParent({
+          adult_email: id,
+          password,
         });
 
         navigate('/parentLanding');
