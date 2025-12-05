@@ -19,6 +19,7 @@ export default function Quiz() {
   const { quizData } = location.state as { quizData: QuizResponse };
   const { quiz_id } = location.state as { quiz_id: number }
   const navigate = useNavigate();
+  const [popUpOpen, setPopUpOpen] = useState(false);
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
