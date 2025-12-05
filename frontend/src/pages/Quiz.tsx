@@ -69,6 +69,7 @@ export default function Quiz() {
       await sendQuizUpdate(score);
       navigate('/quizResults', {
         state: {
+          quiz_id: quiz_id,
           quizData: quizData,
           score: score,
         },
