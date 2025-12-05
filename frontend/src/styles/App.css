@@ -16,6 +16,7 @@ html, body {
   padding: 0;
   min-height: 100%;
   width: 100%;
+  overflow-x: hidden;
 }
 
 .page-background {
@@ -29,7 +30,7 @@ html, body {
   padding: 2rem 1rem;
   background-color: whitesmoke;
   box-sizing: border-box;
-}
+}d
 
 .logo {
   width: 150px;
