@@ -8,9 +8,9 @@ import '../styles/Rewards.css'
 import '../styles/App.css'
 
 //Api imports
-import { getNumCoins, listCustomRewards, redeemCustomReward } from "../api/rewards";
+import { getNumCoins, listCustomRewards, redeemCustomReward, spendCoins } from "../api/rewards";
 import { getCurrentStudent } from "../api/students";
-import type { CustomReward, GetCoinsRequest, ListCustomRewardsRequest, RedeemCustomRewardRequest } from "../api/types";
+import type { CustomReward, GetCoinsRequest, ListCustomRewardsRequest, RedeemCustomRewardRequest, SpendCoinsRequest } from "../api/types";
 
 export default function Rewards() {
   const [popUpOpen, setPopUpOpen] = useState(false);
@@ -21,6 +21,24 @@ export default function Rewards() {
   const [numCoins, setNumCoins] = useState<number>()
   const [customRewards, setCustomRewards] = useState<CustomReward[]>([])
   const [rewardRedeemed] = useState<boolean[]>([false]);
+
+  const appSkins = {
+    jurassicJungle: {
+      name: "Jurassic Jungle Skin",
+      cost: 10,
+      gradient: "linear-gradient(180deg, #567d46, #3b5e34, #283c22, #1e261d)"
+    },
+    dragonFire: {
+      name: "Dragon Fire Skin",
+      cost: 10,
+      gradient: "linear-gradient(to bottom right, #3e0000, #800000, #ff4500)"
+    },
+    candyKingdom: {
+      name: "Candy Kingdom Skin",
+      cost: 10,
+      gradient: "linear-gradient(180deg, #FF9A9E, #FECFEF, #E0C3FC)"
+    }
+  };
 
   const changeSkin = (color: string) => {
     setSelectedColor(color);
@@ -95,12 +113,16 @@ export default function Rewards() {
 
 
   //When redeem custom rewards is clicked
-  async function redeemCustomRewardClicked(reward_id: number, reward_index: number) {
+  async function redeemCustomRewardClicked(reward_id: number, reward_index: number, cost: number) {
     try {
       if (myId && reward_id) {
         const request: RedeemCustomRewardRequest = { child_id: myId, reward_id: reward_id }
         const result = await redeemCustomReward(request)
-
+        if (result.success) {
+          const request: SpendCoinsRequest = { coins_to_spend: cost }
+          const spendResult = await spendCoins(request)
+          console.log("Did we succeed spending coins: ", spendResult.message)
+        }
         rewardRedeemed[reward_index] = true
 
         return result
@@ -108,6 +130,10 @@ export default function Rewards() {
     } catch (error) {
       console.log('Error redeeming custom reward: ', error)
     }
+  }
+
+  async function storeItemClicked(skinGradient: string) {
+    changeSkin(skinGradient)
   }
 
 
@@ -142,7 +168,7 @@ export default function Rewards() {
             {customRewards.map((customReward, index) => {
               return (
                 <Button
-                  onClick={() => redeemCustomRewardClicked(customReward.reward_id, index)}
+                  onClick={() => redeemCustomRewardClicked(customReward.reward_id, index, customReward.coin_cost)}
                   className="miniReward"
                   style={rewardRedeemed[index] ? { backgroundColor: 'green' } : {}}
                 >
@@ -159,6 +185,16 @@ export default function Rewards() {
             <h2>Store</h2>
 
             <div className="storeItemsRow">
+              {Object.entries(appSkins).map(([key, skin]) => (
+                <Button
+                  key={key}
+                  className="storeItem"
+                  onClick={() => storeItemClicked(skin.gradient)}
+                >
+                  {skin.name}: {skin.cost} coins
+                </Button>
+              ))}
+
               <Button className="storeItem" onClick={() => changeSkin("linear-gradient(180deg, #567d46, #3b5e34, #283c22, #1e261d)")} >
                 Jurassic Jungle Skin: 10 coins
               </Button>

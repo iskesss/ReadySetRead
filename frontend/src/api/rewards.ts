@@ -7,7 +7,9 @@ import type {
     ListCustomRewardsRequest,
     ListCustomRewardsResponse,
     RedeemCustomRewardRequest,
-    RedeemCustomRewardResponse
+    RedeemCustomRewardResponse,
+    SpendCoinsRequest,
+    SpendCoinsResponse
 } from "./types";
 
 //Get number of coins for current child
@@ -18,7 +20,12 @@ export async function getNumCoins(
     return response.data;
 }
 
-
+export async function spendCoins(
+    data: SpendCoinsRequest
+): Promise<SpendCoinsResponse> {
+    const response = await api.post<SpendCoinsResponse>('/child/spend-coins', data)
+    return response.data;
+}
 
 
 //Create a new custom reward

@@ -75,6 +75,14 @@ export interface RedeemCustomRewardRequest {
   reward_id: number
 }
 
+export interface SpendCoinsRequest {
+  coins_to_spend: number
+}
+
+export interface UpdateBackgroundSkinRequest {
+  new_skin: string
+}
+
 // =============================
 // API Response Types
 // =============================
@@ -174,6 +182,16 @@ export interface RedeemCustomRewardResponse {
   success: boolean
   remaining_coins: number
   message: string
+}
+
+export interface SpendCoinsResponse {
+  success: boolean
+  remaining_coins: number
+  message: string
+}
+
+export interface GetBackgroundSkinResponse {
+  bg_skin: string
 }
 
 // Error Response Type
