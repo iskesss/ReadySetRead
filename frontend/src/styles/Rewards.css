@@ -3,10 +3,14 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  min-height: 100vh;
-  
-  margin: -50px;     
+  min-height: calc(100vh - 60px);;
+  margin: -55px;     
   padding: 50px;
+}
+
+.page-background {
+  padding-top: 0 !important;
+  gap: 0 !important;         
 }
 
 .container {
@@ -58,11 +62,17 @@
   background: radial-gradient(circle at 30% 30%, #ffd700, #ffa500);
   color: var(--spaceCadet);
   border-radius: 50%;
-  padding: 10px 20px;
   border: 3px solid #bf8404;
-  margin: 0 8px;
   font-weight: 800;
   font-size: 28px;
+  width: 65px;
+  height: 65px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  margin: 0 10px;   
+  vertical-align: middle; 
 }
 
 .card.parentCard {
@@ -77,7 +87,7 @@
   display: block;
   width: 100%;
   margin: 8px 0;
-  background-color: var(--pumpkin);
+  background-color: linear-gradient(180deg, #FF9A9E, #FECFEF, #E0C3FC);
   color: white;
   border: none;
   border-radius: 8px;
@@ -89,7 +99,7 @@
 
 .parentCard .miniReward:hover {
   transform: scale(1.05);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 6px rgba(0,0,0,1);
 }
 
 .fullRow {
@@ -118,7 +128,7 @@
   flex: 1 1 150px; 
   margin: 0 !important;
   min-height: 100px;
-  background-color: var(--spaceCadet) !important;
+  /*background-color: var(--spaceCadet);*/
   color: white;
   border: none;
   border-radius: 8px;
@@ -134,7 +144,7 @@
 }
 
 
-/*popup window stuff below*/
+/*popup window stuff*/
 
 .popUpOverlay {
   position: fixed;
