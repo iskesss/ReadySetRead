@@ -65,6 +65,7 @@ export default function QuizResults() {
                             <span>{resultData.score}</span>
                         </div>
 
+                        {/*CONNECT TO BACKEND for coins earned */}
                         <div className='coinDisplay'>
                             <p>You earned</p>
                             <div className='coinBubble'>{earnedCoins} </div>
