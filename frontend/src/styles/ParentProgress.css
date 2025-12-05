@@ -1,4 +1,3 @@
-
 .parentProgressContainer {
   width: 100%;
   height: 100%;
@@ -59,6 +58,20 @@
   box-sizing: border-box;
 }
 
+/* kinda funky setup was fighting something*/
+.progressCard,
+.progressCard * {
+  color: #1E1B4B !important;
+}
+.progressCard *,
+.progressCard {
+  color: #1E1B4B !important;
+}
+
+.progressCard button,
+.progressCard button * {
+  color: #fef6e4 !important;
+}
 
 .goalRow {
   margin-bottom: 20px;
@@ -67,7 +80,7 @@
 .progressBar {
   width: 100%;
   height: 15px;
-  background-color: #e6e6e6;
+  background-color: #fff8e1;
   border-radius: 10px;
   margin-top: 6px;
   overflow: hidden;
@@ -110,8 +123,8 @@
 }
 
 .book {
-  background-color: #e6e6e6;
-  border: 1px solid #e6e6e6;
+  background-color: #fff8e1;
+  border: 1px solid #fff8e1;
   border-radius: 12px;
   padding: 15px;
 }
