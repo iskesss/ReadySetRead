@@ -78,20 +78,22 @@
   margin-bottom: 20px;
 }
 
-.progressBar {
-  width: 100%;         
-  height: 15px;      
+.static_ProgressBarContainer {
+  width: 100%;
+  height: 15px;
   border-radius: 10px;
-  background-color: #fff8e1;
+  background-color: #fff8e1;   
+  border: 2px solid var(--spaceCadet); 
   overflow: hidden;
-  animation: none !important; 
+  position: relative;
 }
 
-.progressBarFill {
+.static_progressBarFill {
   height: 100%;
   background-color: var(--spaceCadet);
   border-radius: 10px;
-  width: 50%;               
+  width: 0%;                     
+  transition: width 0.5s ease-in-out; 
 }
 
 .goalButtons {
