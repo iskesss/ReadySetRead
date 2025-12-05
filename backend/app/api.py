@@ -106,7 +106,7 @@ class QuizOut(BaseModel):
     attempted: bool
     passed: bool
     score: int
-    feedback: str
+    feedback: str | None = None
 
 
 class QuizFeedbackOut(BaseModel):

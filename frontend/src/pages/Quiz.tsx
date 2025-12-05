@@ -44,6 +44,7 @@ export default function Quiz() {
         await sendQuizUpdate(newScore)
 
         //Navigate to results page once backend update is done
+        console.log("Navigating to results page")
         navigate('/quizResults', {
           state: {
             quiz_id: quiz_id,
@@ -90,7 +91,9 @@ export default function Quiz() {
         quiz_questions: quizData,
         child_responses: child_responses
       }
+      console.log("Updating quiz feedback")
       await updateQuizFeedback(updateFeedbackPayload)
+      console.log("Updated quiz feedback")
     } catch (error) {
       console.log("Error sending quiz results to backend: ", error)
     }
@@ -114,7 +117,12 @@ export default function Quiz() {
         <div className='card quiz-question-box'>
           <h1>Question {currentQuestionIndex + 1} of{" "}{quizData.questions.length}</h1>
           {!showResults && <p>{currentQuestion.question}</p>}
-          {showResults && <p>{currentQuestion.explanation}</p>}
+          {showResults &&
+            <div style={{ backgroundColor: 'lightpink', padding: '1rem', borderRadius: '6px' }}>
+              <h1>Incorrect!</h1>
+              <p>{currentQuestion.explanation}</p>
+            </div>
+          }
         </div>
 
         <div className='answer-container'>

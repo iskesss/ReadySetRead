@@ -28,6 +28,7 @@ export default function QuizResults() {
             try {
                 const result = await getQuizFeedback({ quiz_id })
                 setFeedback(result.feedback)
+                console.log("Feedback received: ", result.feedback)
             } catch (error) {
                 console.error('Error getting feedback: ', error)
             }
