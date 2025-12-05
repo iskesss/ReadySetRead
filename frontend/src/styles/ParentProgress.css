@@ -27,17 +27,21 @@
 .childTab {
   padding: 10px 20px;
   border-radius: 12px;
-  border: 1px solid lightgrey;
+  border: 1px solid #d2d2d2;
   cursor: pointer;
+  background-color: #fef6e4;
+  color: var(--spaceCadet); 
+  font-weight: 700;
 }
 
-.childTab:hover {
-  background-color: var(--spaceCadet);;
+.childTab:not(.onChildTab):hover {
+  background-color: #f0e6c9;
 }
 
 .onChildTab {
   background-color: #ffb470;
   border-color: var(--spaceCadet);
+  color: var(--spaceCadet);
 }
 
 
@@ -61,7 +65,7 @@
 /* kinda funky setup was fighting something*/
 .progressCard,
 .progressCard * {
- color: var(--spaceCadet) !important;
+  color: var(--spaceCadet) !important;
 }
 
 .progressCard button,
@@ -121,7 +125,7 @@
 .booksCard p,
 .booksCard span,
 .booksCard strong {
- color: var(--spaceCadet) !important;
+  color: var(--spaceCadet) !important;
 }
 
 .bookList {
