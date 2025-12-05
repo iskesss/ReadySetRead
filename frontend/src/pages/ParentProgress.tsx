@@ -1,5 +1,5 @@
 
-import {useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 //Component imports
@@ -55,13 +55,14 @@ export default function ParentProgress() {
     fetchData()
   }, [])
 
-  // ON selectedChild UPDATE: Get this student's book assignments
+  // ON selectedChild UPDATE: Get this student's book assignments AND update sessionstorage with id for nave bar
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (selectedChild?.child_id != null) {
           const result = await listAllQuizAssignments(selectedChild.child_id)
           setBookAssignments(result)
+          sessionStorage.setItem("targetStudentId", JSON.stringify(selectedChild.child_id))
         }
       } catch (error) {
         console.error('Error getting list of student quiz assignments: ', error)
@@ -72,7 +73,7 @@ export default function ParentProgress() {
 
   async function navToLibrary() {
     if (!selectedChild) return;
-    sessionStorage.setItem('targetStudentId', JSON.stringify(selectedChild.child_id));
+    // sessionStorage.setItem('targetStudentId', JSON.stringify(selectedChild.child_id));
     sessionStorage.setItem('meType', JSON.stringify('parent'));
     navigate('/library');
   }

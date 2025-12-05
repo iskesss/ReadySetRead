@@ -9,18 +9,19 @@ type LibraryBookProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     title: string;
     status: string;
     level: number;
+    added: boolean;
     onAdd: () => void;
 };
 
 // Commenting out old syntax so i remember, will probably need it on the non-dummy version
 // export const LibraryBook = forwardRef<HTMLButtonElement, LibraryBookProps>(({  title, status, level, onAdd ...props }, ref) => {
-export const LibraryBook = forwardRef<HTMLButtonElement, LibraryBookProps>(({ title, status, level, onAdd }) => {
+export const LibraryBook = forwardRef<HTMLButtonElement, LibraryBookProps>(({ title, status, level, added, onAdd }) => {
     return (
         <div className='libraryBookCard'>
             <h3>{title}</h3>
             <p>Status: {status}</p>
             <p>Level: {level}</p>
-            <Button onClick={onAdd}>Add</Button>
+            <Button onClick={onAdd}>{added ? "Added!" : "Add"}</Button>
         </div>
     );
 })

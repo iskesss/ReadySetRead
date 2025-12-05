@@ -1,4 +1,4 @@
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { generateQuiz } from '../api/quiz';
 import '../styles/LibraryBook.css';
@@ -89,18 +89,18 @@ export default function StudentLandingPage() {
     }
   }
 
-  async function navToLibrary() {
-    try {
-      const result = await getCurrentStudent();
-      const student_id = result.child_id;
-      sessionStorage.setItem('targetStudentId', JSON.stringify(student_id));
-      sessionStorage.setItem('meType', JSON.stringify('student'));
-      navigate('/library');
-    } catch (error) {
-      console.log(error)
-      return
-    }
-  }
+  // async function navToLibrary() {
+  //   try {
+  //     const result = await getCurrentStudent();
+  //     const student_id = result.child_id;
+  //     sessionStorage.setItem('targetStudentId', JSON.stringify(student_id));
+  //     sessionStorage.setItem('meType', JSON.stringify('student'));
+  //     navigate('/library');
+  //   } catch (error) {
+  //     console.log(error)
+  //     return
+  //   }
+  // }
 
   const passedCount = studentAssignments.filter(a => a.passed).length;
   const incompleteCount = studentAssignments.filter(a => !a.passed).length;

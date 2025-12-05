@@ -20,6 +20,7 @@ export default function Library() {
     const [books, setBooks] = useState<Book[]>([]);
     const [targetStudentId, setTargetStudentId] = useState<number | null>(null);
     const [meType, setMeType] = useState<string | null>(null);
+    const [added] = useState<boolean[]>([false]);
     // const navigate = useNavigate();
     const [error, setError] = useState<string | null>(null);
 
@@ -49,7 +50,7 @@ export default function Library() {
         fetchData()
     }, [])
 
-    const handleAddBook = (book_id: number) => {
+    const handleAddBook = (book_id: number, index: number) => {
         const postToDB = async () => {
             if (targetStudentId === null) {
                 console.error("No student selected");
@@ -57,13 +58,14 @@ export default function Library() {
             }
             try {
                 const result = await createAssignment({ child_id: targetStudentId, book_id: book_id })
-                return result;
+                console.log(result)
+                added[index] = true
             } catch (error) {
                 setError(String(error))
+                return
             }
         }
-        const response = postToDB()
-        console.log("Success?? : ", response) //To see if it worked before we get the full stack functionality
+        postToDB()
     }
 
     const backClicked = () => {
@@ -88,12 +90,13 @@ export default function Library() {
                 )}
 
                 <div className='libraryGrid'>
-                    {books.map((option) => (
+                    {books.map((option, index) => (
                         <LibraryBook
                             title={option.title}
                             status='incomplete' // need a different route to handle this
                             level={option.reading_level}
-                            onAdd={() => handleAddBook(Number(option.book_id))}
+                            added={added[index]}
+                            onAdd={() => handleAddBook(Number(option.book_id), index)}
                         />
                     ))}
                 </div>

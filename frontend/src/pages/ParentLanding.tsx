@@ -19,6 +19,11 @@ export default function ParentLandingPage() {
   const [students, setStudents] = useState<Child[]>([])
   const [me, setMe] = useState<string>()
 
+  // ON PAGE LOAD: clear sessionStorage
+  useEffect(() => {
+    sessionStorage.clear()
+  }, []);
+
   // ON PAGE LOAD: get my name for greeting
   useEffect(() => {
     const fetchData = async () => {
@@ -48,8 +53,8 @@ export default function ParentLandingPage() {
   }, []);
 
   return (
-        //CONNECT TO BACKEND:CHILDREN NAME(S) & # cards displayed (edge case to add child?)
-        //must also add links to each specific child's progress page
+    //CONNECT TO BACKEND:CHILDREN NAME(S) & # cards displayed (edge case to add child?)
+    //must also add links to each specific child's progress page
 
     <div className='parentLandingContainer'>
       <h1 className="parentWelcome">Welcome, {me}!</h1>
