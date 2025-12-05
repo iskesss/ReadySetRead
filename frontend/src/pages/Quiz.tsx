@@ -42,9 +42,9 @@ export default function Quiz() {
 
       if (isLastQuestion) {
         setPopUpOpen(true);
-        
+
         //Wait for quiz completion data to be sent
-        await sendQuizUpdate(newScore)
+        const coinsEarned = await sendQuizUpdate(newScore)
 
         setPopUpOpen(false);
 
@@ -54,7 +54,8 @@ export default function Quiz() {
           state: {
             quiz_id: quiz_id,
             quizData: quizData,
-            score: newScore
+            score: newScore,
+            coinsEarned: coinsEarned
           }
         })
       } else {
@@ -72,13 +73,14 @@ export default function Quiz() {
 
     if (lastQuestion) {
       setPopUpOpen(true);
-      await sendQuizUpdate(score);
+      const coinsEarned = await sendQuizUpdate(score);
       setPopUpOpen(false);
       navigate('/quizResults', {
         state: {
           quiz_id: quiz_id,
           quizData: quizData,
           score: score,
+          coinsEarned: coinsEarned
         },
       });
     } else {
@@ -87,13 +89,13 @@ export default function Quiz() {
     }
   };
 
-  async function sendQuizUpdate(newScore: number) {
+  async function sendQuizUpdate(newScore: number): Promise<number> {
     try {
       const updateQuizPayload = {
         quiz_id: quiz_id,
         score: newScore
       }
-      await updateQuiz(updateQuizPayload)
+      const response = await updateQuiz(updateQuizPayload)
       const updateFeedbackPayload = {
         quiz_id: quiz_id,
         quiz_questions: quizData,
@@ -102,8 +104,10 @@ export default function Quiz() {
       console.log("Updating quiz feedback")
       await updateQuizFeedback(updateFeedbackPayload)
       console.log("Updated quiz feedback")
+      return response.coinsEarned
     } catch (error) {
       console.log("Error sending quiz results to backend: ", error)
+      return 0
     }
   }
 
