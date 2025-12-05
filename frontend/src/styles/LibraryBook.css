@@ -120,3 +120,15 @@
   color: #1E1B4B !important;
   border: 1px solid #1E1B4B !important;
 }
+
+.recharts-legend-item-text {
+  color: #1E1B4B !important;
+  fill: #1E1B4B !important;
+  font-weight: 600;
+}
+
+.progressReportCard--lightText .recharts-legend-item-text {
+  color: #fef6e4 !important;
+  fill: #fef6e4 !important;
+}
+
