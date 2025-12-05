@@ -10,8 +10,7 @@ import '../styles/App.css'
 export default function Rewards() {
   const [popUpOpen, setPopUpOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<string>("");
-  const [pageBackground, setPageBackground] = useState<string>("whitesmoke");
-
+  const [pageBackground, setPageBackground] = useState<string>(""); // default background
 
   const changeSkin = (color: string) => {
     setSelectedColor(color);
@@ -19,7 +18,7 @@ export default function Rewards() {
   };
 
   const yesClicked = () => {
-    setPageBackground(selectedColor);
+    setPageBackground(selectedColor); // Apply the chosen skin
     setPopUpOpen(false);
   };
 
@@ -28,11 +27,10 @@ export default function Rewards() {
   };
 
 
-
   return (
-    <div 
+    <div
       className="rewardsPage"
-      style={{ background: pageBackground, transition: 'background 0.5s ease' }}
+      style={{ background: pageBackground, minHeight: '100vh', transition: 'background 0.5s ease' }}
     >
 
       {popUpOpen && (
@@ -76,8 +74,12 @@ export default function Rewards() {
                 Dragon Fire Skin: 10 coins 
               </Button>
 
-              <Button className="storeItem" onClick={() => changeSkin("linear-gradient(180deg, #FF9A9E, #FECFEF, #E0C3FC)")}>  
-                Candy Kingdom Skin: 10 coins 
+              <Button
+                className="storeItem"
+                onClick={() => changeSkin("linear-gradient(180deg, #FF9A9E, #FECFEF, #E0C3FC)")}
+                /*style={{ backgroundColor: "linear-gradient(180deg, #FF9A9E, #FECFEF, #E0C3FC)" }}*/
+              >
+                Candy Kingdom Skin: 10 coins
               </Button>
 
             </div>
