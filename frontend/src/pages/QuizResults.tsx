@@ -17,7 +17,7 @@ export default function QuizResults() {
     // const quizData = resultData['quizData']
     const score = resultData['score']
     const quiz_id = resultData['quiz_id']
-    const earnedCoins = 15
+    const earnedCoins = resultData['coinsEarned'] || 0
 
     const [feedback, setFeedback] = useState<string>()
     const [isLoadingFeedback, setIsLoadingFeedback] = useState(true)
