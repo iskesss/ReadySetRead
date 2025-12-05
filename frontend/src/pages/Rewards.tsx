@@ -176,7 +176,7 @@ export default function Rewards() {
                 </Button>
               )
             })}
-            <Button className="miniReward">Ice cream: 25 coins</Button>
+            {/* <Button className="miniReward">Ice cream: 25 coins</Button> */}
           </div>
         </div>
 
@@ -194,22 +194,6 @@ export default function Rewards() {
                   {skin.name}: {skin.cost} coins
                 </Button>
               ))}
-
-              <Button className="storeItem" onClick={() => changeSkin("linear-gradient(180deg, #567d46, #3b5e34, #283c22, #1e261d)")} >
-                Jurassic Jungle Skin: 10 coins
-              </Button>
-
-              <Button className="storeItem" onClick={() => changeSkin("linear-gradient(to bottom right, #3e0000, #800000, #ff4500)")}>
-                Dragon Fire Skin: 10 coins
-              </Button>
-
-              <Button
-                className="storeItem"
-                onClick={() => changeSkin("linear-gradient(180deg, #FF9A9E, #FECFEF, #E0C3FC)")}
-              /*style={{ backgroundColor: "linear-gradient(180deg, #FF9A9E, #FECFEF, #E0C3FC)" }}*/
-              >
-                Candy Kingdom Skin: 10 coins
-              </Button>
 
             </div>
 

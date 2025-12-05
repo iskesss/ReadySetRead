@@ -9,14 +9,16 @@ import '../styles/ParentProgress.css'
 import '../styles/App.css'
 
 // API imports
-import { getStudents } from '../api/parents';
+import { getCurrentParent, getStudents } from '../api/parents';
 import { listAllQuizAssignments } from '../api/students';
 import { getAllBooks } from '../api/books'
-import type { Child, Book, Assignment } from "../api/types"
+import { createCustomReward } from '../api/rewards';
+import type { ParentResponse, Child, Book, Assignment, CreateCustomRewardRequest } from "../api/types"
 
 export default function ParentProgress() {
   const navigate = useNavigate();
 
+  const [me, setMe] = useState<ParentResponse>()
   const [students, setStudents] = useState<Child[]>()
   const [selectedChild, setSelectedChild] = useState<Child>();
   const [books, setBooks] = useState<Book[]>([]);
@@ -26,6 +28,19 @@ export default function ParentProgress() {
 
   const [goalText, setGoalText] = useState("");
   const [goalCoins, setGoalCoins] = useState<string>("");
+
+  // ON PAGE LOAD: Get me
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await getCurrentParent()
+        setMe(result)
+      } catch (error) {
+        console.error('Error getting list of students: ', error)
+      }
+    }
+    fetchData()
+  }, []);
 
   // ON PAGE LOAD: Get this parent's kids
   useEffect(() => {
@@ -187,7 +202,7 @@ export default function ParentProgress() {
             <h3>Add Goal</h3>
 
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
 
                 // Basic client-side validation
@@ -202,6 +217,21 @@ export default function ParentProgress() {
 
                 // Save action: for now, just log and close.
                 // TODO: call backend or update local state to persist.
+                try {
+                  if (selectedChild && me) {
+                    const request: CreateCustomRewardRequest = {
+                      child_id: selectedChild.child_id,
+                      description: goalText,
+                      coin_cost: Number(goalCoins),
+                      adult_email: me.adult_email
+                    }
+                    const result = await createCustomReward(request)
+                    console.log(result)
+                  }
+                } catch (error) {
+                  console.log("error creating custom reward: ", error)
+                }
+
                 console.log("Saving goal:", { goalText, goalCoins: Number(goalCoins), childId: selectedChild?.child_id });
 
                 // Reset form + close
