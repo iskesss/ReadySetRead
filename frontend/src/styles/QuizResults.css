@@ -1,24 +1,194 @@
-.page-background {
+.quizResultsPageBkgd {
     display: flex;
-    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: -70px;
+    min-height: 100vh;
+    font-family: 'Arial', sans-serif;
+}
+
+.outer-container {
+    border: 3px solid #2E3456; 
+    border-radius: 30px;       
+    padding: 50px;
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    gap: 50px;
+    box-shadow: 12px 12px 0px rgba(46, 52, 86, 0.15);
+    background-color: #fef6e4;
+}
+
+.quizSection {
+    flex: 2; 
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
     justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--spaceCadet); 
+    padding-bottom: 20px;
 }
 
-main {
+h1 {
+    font-family: 'Georgia', serif;
+    color: #2E3456;
+    margin: 0;
+    font-size: 2.4rem;
+}
+
+.scoreCircle {
+    border: 2px solid #2E3456;
+    border-radius: 50px;
+    padding: 10px 24px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    background: #fff;
+    color: #2E3456;
+    white-space: nowrap;
+    box-shadow: 4px 4px 0px rgba(46, 52, 86, 0.1);
+}
+
+h3 {
+    font-family: 'Georgia', serif;
+    color: #2E3456;
+    margin-bottom: 15px;
+    font-size: 1.4rem;
+}
+
+.incorrect-list-container {
+    flex-grow: 1;
+    border: 2px solid #E2E8F0;
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 30px;
+    height: 250px; 
+    overflow-y: auto;
+    background: #FAFAFA;
+}
+
+.incorrect-list-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+
+.questionRow {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 12px;
+    transition: transform 0.2s ease;
+}
+
+.questionRow:hover {
+    transform: translateX(4px);
+}
+
+.questionNumber {
+    border: 2px solid #2E3456;
+    border-radius: 12px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #2E3456;
+    flex-shrink: 0;
+    background: white;
+    box-shadow: 2px 2px 0px rgba(46, 52, 86, 0.1);
+}
+
+.questionFeedback {
+    border: 1px solid #CBD5E0;
+    border-radius: 12px;
+    padding: 0 16px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    color: #4A5568;
+    background: white;
+    line-height: 1.4;
+}
+
+.buttonRow {
+    display: flex;
+    gap: 16px;
+    margin-top: auto;
+}
+
+.rightColumn {
+    flex: 1; 
     display: flex;
     flex-direction: column;
-    width: 60%;
 }
 
-aside {
+.earnings-card {
+    border: 2px solid #2E3456;
+    border-radius: 20px;
+    padding: 24px;
+    height: auto;
+    background: #FAFAFA;
     display: flex;
     flex-direction: column;
-    width: auto;
-    margin: 16px;
+    margin-top: 66px; 
+    flex-grow: 1;
+    box-shadow: 4px 4px 0px rgba(46, 52, 86, 0.05);
 }
 
-.button-container {
+.earnings-header {
+    font-family: 'Georgia', serif;
+    font-size: 1.5rem;
+    color: #2E3456;
+    border-bottom: 2px solid #2E3456;
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.statsItem {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+    color: #2E3456;
     display: flex;
-    flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
+    font-weight: 500;
+}
+
+.coinDisplay {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-family: 'Georgia', serif;
+    color: #2E3456;
+}
+
+.coinBubble {
+    background: radial-gradient(circle at 30% 30%, orange, var(--pumpkin));
+    border: 3px solid orange;
+    border-radius: 50%;
+    font-weight: 800;
+    font-size: 28px;
+    color: #2E3456;
+    width: 85px;       
+    height: 85px;      
+    display: flex;     
+    align-items: center; 
+    justify-content: center;
+    padding: 0;       
+    margin: 15px 0;    
+    box-shadow: 0px 4px 6px rgba(0,0,0,0.15);
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
 }
