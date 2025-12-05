@@ -18,14 +18,14 @@ export default function ProgressPieChart({ passed, incomplete }: Props) {
     { name: "Incomplete", value: incomplete },
   ];
 
-  // Passed uses gradient via <defs>, incomplete is solid orange
+
   const COLORS = ["url(#passedGradient)", "#ffa157"];
 
   return (
     <div style={{ width: "100%", height: 260 }}>
       <ResponsiveContainer>
         <PieChart>
-          {/* define gradient fills */}
+
           <defs>
             <linearGradient id="passedGradient" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor="#b8f1cc" />
@@ -37,16 +37,29 @@ export default function ProgressPieChart({ passed, incomplete }: Props) {
             data={data}
             cx="50%"
             cy="50%"
-            label={false}        // no numbers/labels on slices
+            label={false}
             outerRadius={80}
             dataKey="value"
           >
-            {data.map((entry, idx) => (
-              <Cell key={`cell-${idx}`} fill={COLORS[idx]} />
+            {data.map((_, idx) => (
+              <Cell key={idx} fill={COLORS[idx]} />
             ))}
           </Pie>
 
-          <Tooltip />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "#fef6e4",
+              border: "1px solid #ddd",
+              borderRadius: 8,
+              boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+            }}
+            itemStyle={{
+              color: "#1E1B4B",
+              fontWeight: 600,
+              fontSize: "1.1rem",
+            }}
+          />
+
           <Legend />
         </PieChart>
       </ResponsiveContainer>
