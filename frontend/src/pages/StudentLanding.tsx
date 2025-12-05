@@ -90,7 +90,7 @@ export default function StudentLandingPage() {
       });
     } catch (error) {
       console.log(error)
-      setQuizError("Failed to generate quiz. Please try again.");
+      setQuizError("");
       setIsGeneratingQuiz(false);
       setPopUpOpen(false);
     }

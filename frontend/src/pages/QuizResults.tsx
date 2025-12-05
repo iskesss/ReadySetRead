@@ -13,24 +13,43 @@ export default function QuizResults() {
     const location = useLocation();
 
     //Receive state data from the quiz page
-    const resultData = location.state //TODO: Will, check what is being passed in state
+    const resultData = location.state
     // const quizData = resultData['quizData']
     const score = resultData['score']
     const quiz_id = resultData['quiz_id']
     const earnedCoins = 15
 
     const [feedback, setFeedback] = useState<string>()
+    const [isLoadingFeedback, setIsLoadingFeedback] = useState(true)
 
 
     //ON PAGE LOAD: Get and store feedback
     useEffect(() => {
+        let pollCount = 0
+        const maxPolls = 20 // Poll for up to 20 seconds to wait for backend
+
         const fetchData = async () => {
             try {
                 const result = await getQuizFeedback({ quiz_id })
-                setFeedback(result.feedback)
-                console.log("Feedback received: ", result.feedback)
+                if (result.feedback && result.feedback.trim() !== '') {
+                    setFeedback(result.feedback)
+                    setIsLoadingFeedback(false)
+                    console.log("Feedback received: ", result.feedback)
+                } else if (pollCount < maxPolls) {
+                    // Feedback not ready yet, poll again in 1 second
+                    pollCount++
+                    console.log(`Feedback not ready, polling again (${pollCount}/${maxPolls})...`)
+                    setTimeout(fetchData, 1000)
+                } else {
+                    // Give up after max polls
+                    setFeedback("Feedback is still being generated. Please check back later.")
+                    setIsLoadingFeedback(false)
+                    console.log("Max poll attempts reached")
+                }
             } catch (error) {
                 console.error('Error getting feedback: ', error)
+                setFeedback("Unable to load feedback at this time.")
+                setIsLoadingFeedback(false)
             }
         }
         fetchData()
@@ -72,8 +91,11 @@ export default function QuizResults() {
                     <h3>Feedback:</h3>
 
                     <div className='incorrect-list-container'>
-
-                        <div className='questionFeedback'>{feedback}</div>
+                        {isLoadingFeedback ? (
+                            <div className='questionFeedback'>Loading feedback...</div>
+                        ) : (
+                            <div className='questionFeedback'>{feedback}</div>
+                        )}
                     </div>
 
                     <div className='buttonRow'>
