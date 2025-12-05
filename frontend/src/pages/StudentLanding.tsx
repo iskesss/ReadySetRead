@@ -27,6 +27,7 @@ export default function StudentLandingPage() {
   const [quizError, setQuizError] = useState<string | null>(null);
   const [studentAssignments, setStudentAssignments] = useState<Assignment[]>([])
   const [books, setBooks] = useState<Book[]>([])
+  const [popUpOpen, setPopUpOpen] = useState(false)
 
   // ON PAGE LOAD: Get my Id
   useEffect(() => {
@@ -71,7 +72,9 @@ export default function StudentLandingPage() {
 
   async function takeQuiz(book: BookType) {
     try {
+      if(isGeneratingQuiz) return;
       setIsGeneratingQuiz(true);
+      setPopUpOpen(true); 
       setQuizError(null);
 
       const quizData = await generateQuiz({
@@ -81,6 +84,7 @@ export default function StudentLandingPage() {
         num_questions: 10,
       });
       const quiz_id = book.quiz_id
+      setPopUpOpen(false);
       navigate('/quiz', {
         state: { quizData, quiz_id }
       });
@@ -88,6 +92,7 @@ export default function StudentLandingPage() {
       console.log(error)
       setQuizError("Failed to generate quiz. Please try again.");
       setIsGeneratingQuiz(false);
+      setPopUpOpen(false);
     }
   }
 
@@ -109,6 +114,20 @@ export default function StudentLandingPage() {
 
   return (
     <div className="studentLandingContainer">
+      
+      {popUpOpen && (
+        <div className="popUpOverlay">
+          <div className="popUpBox">
+            <p className="popUpText">Generating your quiz, please wait...</p>
+
+            <div className="progressBarContainer">
+              <div className="progressBar"> </div>
+            </div>
+          
+          </div>
+        </div>
+      )}
+      
       <div
         style={{
           display: "flex",
@@ -150,6 +169,7 @@ export default function StudentLandingPage() {
                   isGeneratingQuiz={isGeneratingQuiz}
                 />
               );
+
             })}
           </div>
         </div>
