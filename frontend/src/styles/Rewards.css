@@ -3,14 +3,14 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  min-height: calc(100vh - 60px);;
-  margin: -55px;     
+  min-height: calc(100vh - 60px);
+  margin: -55px;
   padding: 50px;
 }
 
 .page-background {
   padding-top: 0 !important;
-  gap: 0 !important;         
+  gap: 0 !important;
 }
 
 .container {
@@ -57,6 +57,10 @@
   text-transform: uppercase;
   letter-spacing: 1px;
 }
+.card.parentCard h2,
+.card.storeCard h2 {
+  color: var(--spaceCadet);
+}
 
 .coinBubble {
   background: radial-gradient(circle at 30% 30%, #ffd700, #ffa500);
@@ -71,8 +75,8 @@
   justify-content: center;
   align-items: center;
   padding: 0;
-  margin: 0 10px;   
-  vertical-align: middle; 
+  margin: 0 10px;
+  vertical-align: middle;
 }
 
 .card.parentCard {
@@ -87,19 +91,21 @@
   display: block;
   width: 100%;
   margin: 8px 0;
-  background-color: linear-gradient(180deg, #FF9A9E, #FECFEF, #E0C3FC);
+  background: #ffa157;
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 10px;
+  border-radius: 12px;
+  padding: 14px;
   font-weight: 600;
+  font-size: 1.3rem;
   cursor: pointer;
+  text-align: center;
   transition: all 0.2s ease-in-out;
 }
 
 .parentCard .miniReward:hover {
   transform: scale(1.05);
-  box-shadow: 0 2px 6px rgba(0,0,0,1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
 .fullRow {
@@ -109,7 +115,7 @@
 }
 
 .card.storeCard {
-  min-height: 250px; 
+  min-height: 250px;
   justify-content: flex-start;
   text-align: center;
 }
@@ -125,7 +131,7 @@
 
 .storeItemsRow button {
   width: auto !important;
-  flex: 1 1 150px; 
+  flex: 1 1 150px;
   margin: 0 !important;
   min-height: 100px;
   /*background-color: var(--spaceCadet);*/
@@ -140,7 +146,7 @@
 .storeItemsRow button:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  
+
 }
 
 
@@ -193,3 +199,8 @@
   transform: scale(1.05);
 }
 
+.card.piggyCard p {
+  color: var(--spaceCadet);
+  font-weight: 600;
+  font-size: 1.4rem;
+}
