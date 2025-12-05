@@ -251,22 +251,28 @@ def generate_quiz_feedback(
         "- If a student answer is a single letter like 'A', 'B', 'C', or 'D', treat "
         "  it as choosing options[0], options[1], options[2], or options[3].\n"
         "- Mark each question as correct or incorrect based on this comparison.\n\n"
-        "Your job is to generate exactly TWO sentences of feedback:\n"
+        "Your job is to generate 3-4 sentences of detailed feedback:\n"
         "1. First sentence: Tell the student how they did on the quiz (mention how "
         "   many they got correct out of the total).\n"
-        "2. Second sentence: Tell them the main things they should focus on to improve, "
-        "   based on the patterns in what they got wrong (for example: understanding "
-        "   why characters do things, remembering story details, understanding cause "
-        "   and effect, or paying attention to feelings and themes).\n\n"
+        "2. Following sentences: Provide specific feedback about what they need to work on, "
+        "   including:\n"
+        "   - Mention specific reading skills they struggled with (e.g., understanding "
+        "     character motivations, identifying cause and effect, remembering key story "
+        "     details, understanding character relationships, or recognizing themes).\n"
+        "   - Reference specific parts of the story where they had trouble (beginning, "
+        "     middle, or end) if there's a clear pattern.\n"
+        "   - Give concrete examples when possible (e.g., 'You had trouble with questions "
+        "     about why characters made certain choices' or 'Try to pay closer attention "
+        "     to what happens at the beginning of the story').\n\n"
         "Style and format:\n"
         "- Speak directly to the student (use \"you\").\n"
         "- Use simple, age-appropriate language for K-6 students.\n"
         "- Be encouraging but honest.\n"
         "- Output must be plain text (a single string), not JSON.\n"
-        "- EXACTLY two sentences, no more.\n"
+        "- Aim for 3-4 sentences that provide specific, actionable feedback.\n"
         "- Do not mention that you are an AI or reference the quiz JSON structure; the entire response "
-        "  must be plain text (a single long string), not JSON. "
-        "- just give the feedback.\n"
+        "  must be plain text (a single long string), not JSON.\n"
+        "- Just give the feedback.\n"
     )
 
 
@@ -295,7 +301,7 @@ def generate_quiz_feedback(
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},
         ],
-        max_tokens=250, # keeps feedback concise enough to fit in our PostgreSQL DB
+        max_tokens=250, 
     )
 
     feedback = response.choices[0].message.content.strip()
