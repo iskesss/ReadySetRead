@@ -134,7 +134,7 @@ export default function Rewards() {
         <div className="topRow">
           <div className="card piggyCard">
             <h2>Piggy Bank</h2>
-            <p>You have <span className="coinBubble">{numCoins}</span> coins!</p>
+            <p>You have <span className="coinBubble">{numCoins ?? 0}</span> coins!</p>
           </div>
 
           <div className="card parentCard">

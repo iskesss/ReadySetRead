@@ -28,6 +28,7 @@ export default function StudentLandingPage() {
   const [studentAssignments, setStudentAssignments] = useState<Assignment[]>([])
   const [books, setBooks] = useState<Book[]>([])
   const [popUpOpen, setPopUpOpen] = useState(false)
+  const [isLoadingAssignments, setIsLoadingAssignments] = useState(true)
 
   // ON PAGE LOAD: Get my Id
   useEffect(() => {
@@ -47,11 +48,14 @@ export default function StudentLandingPage() {
     const fetchData = async () => {
       try {
         if (myId != null) {
+          setIsLoadingAssignments(true)  //these make sure popups don't load when switching pages
           const result = await listAllQuizAssignments(myId)
           setStudentAssignments(result)
+          setIsLoadingAssignments(false)
         }
       } catch (error) {
         console.error('Error getting quiz assignments: ', error)
+        setIsLoadingAssignments(false)
       }
     }
     fetchData()
@@ -118,9 +122,40 @@ export default function StudentLandingPage() {
   const passedCount = studentAssignments.filter((a) => a.passed).length;
   const incompleteCount = studentAssignments.filter((a) => !a.passed).length;
 
+  // function to go to library
+  const goToLibrary = () => {
+    if (myId === null) {
+      console.error('Student ID not available'); 
+      return;
+    }
+    sessionStorage.setItem('targetStudentId', JSON.stringify(myId));
+    sessionStorage.setItem('meType', JSON.stringify('student'));
+    navigate('/library');
+  };
+
   return (
     <div className="studentLandingContainer">
 
+      {/* popup shown when no quizzes assigned */}
+      {!isLoadingAssignments && studentAssignments.length === 0 && books.length > 0 && myId !== null && (
+        <div className="popUpOverlay">
+          <div className="popUpBox emptyStatePopup">
+            <h2 className="popUpText" style={{ fontSize: '28px', marginBottom: '20px' }}>
+              Welcome to Your Dashboard!
+            </h2>
+            <p className="popUpText" style={{ fontSize: '18px', marginBottom: '30px' }}>
+              You don't have any quizzes yet. Go to the Library page to add your first quiz!
+            </p>
+            <div className="popUpButtons">
+              <button onClick={goToLibrary}>
+                Go to Library
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* quiz generation popup */}
       {popUpOpen && (
         <div className="popUpOverlay">
           <div className="popUpBox">

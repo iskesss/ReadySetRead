@@ -103,3 +103,15 @@ main {
   0% { transform: translateX(-120%); }
   100% { transform: translateX(250%); }
 }
+
+/* Empty state popup - larger and more prominent */
+.emptyStatePopup {
+  max-width: 600px;
+  width: 90%;
+  padding: 50px 40px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

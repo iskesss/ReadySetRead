@@ -149,7 +149,7 @@ class GetBackgroundSkinResponse(BaseModel):
     bg_skin: str
 
 class UpdateBackgroundSkinRequest(BaseModel):
-    new_skin: str = Field(max_length=16, description="Background skin identifier")
+    new_skin: str
 
 # CUSTOM REWARDS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
