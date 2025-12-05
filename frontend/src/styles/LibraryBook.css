@@ -36,8 +36,8 @@
   transform: translateY(-4px);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
 }
-
 /*this is a little weird it worked when i tried it so im gonna keep it unless otherwise specified*/
+.libraryBookCard h1,
 .libraryBookCard h1,
 .libraryBookCard h2,
 .libraryBookCard h3 {
@@ -101,16 +101,22 @@
   font-weight: 600;
 }
 
-
-/* When the green skin is active, we add .progressReportCard--lightText.
-   Make all text inside the Progress Report card off-white so it pops on the dark green. */
-.progressReportCard--lightText,
-.progressReportCard--lightText * {
+.progressReportCard--lightText h2 {
   color: #fef6e4 !important;
 }
 
-/* Recharts legend uses its own class, so double-ensure it flips too */
-.progressReportCard--lightText .recharts-legend-item-text {
-  color: #fef6e4 !important;
-  fill: #fef6e4 !important;
+.recharts-tooltip-wrapper,
+.recharts-default-tooltip {
+  background: #fef6e4 !important;
+  color: #1E1B4B !important;
+  border: 1px solid #1E1B4B !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important;
+}
+
+.progressReportCard--lightText .recharts-tooltip-wrapper,
+.progressReportCard--lightText .recharts-default-tooltip {
+  background: #fef6e4 !important;
+  color: #1E1B4B !important;
+  border: 1px solid #1E1B4B !important;
 }
