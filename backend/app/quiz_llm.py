@@ -24,7 +24,7 @@ if not OPENAI_API_KEY:                            #raise error if missing
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-DEFAULT_QUIZ_MODEL = "gpt-5-mini"
+DEFAULT_QUIZ_MODEL = "gpt-4.1"
 
 def _quiz_json_schema() -> dict: #defining the JSON schema for the quiz questions
     return {
