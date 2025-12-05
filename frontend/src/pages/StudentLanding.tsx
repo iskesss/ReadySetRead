@@ -70,31 +70,35 @@ export default function StudentLandingPage() {
     fetchData()
   }, [])
 
-  async function takeQuiz(book: BookType) {
-    try {
-      if(isGeneratingQuiz) return;
-      setIsGeneratingQuiz(true);
-      setPopUpOpen(true); 
-      setQuizError(null);
 
-      const quizData = await generateQuiz({
-        book_title: book.title,
-        author: 'J.K. Rowling',
-        reading_level: book.level.toString(),
-        num_questions: 10,
-      });
-      const quiz_id = book.quiz_id
-      setPopUpOpen(false);
-      navigate('/quiz', {
-        state: { quizData, quiz_id }
-      });
-    } catch (error) {
-      console.log(error)
-      setQuizError("");
-      setIsGeneratingQuiz(false);
-      setPopUpOpen(false);
-    }
+  async function takeQuiz(book: BookType) {
+  try {
+    if (isGeneratingQuiz) return;
+    setIsGeneratingQuiz(true);
+    setQuizError(null);
+    setPopUpOpen(true);
+
+    const quizData = await generateQuiz({
+      book_title: book.title,
+      author: 'J.K. Rowling',
+      reading_level: book.level.toString(),
+      num_questions: 10,
+    });
+    const quiz_id = book.quiz_id;
+
+    setPopUpOpen(false);
+    setIsGeneratingQuiz(false);
+
+    navigate('/quiz', {
+      state: { quizData, quiz_id },
+    });
+  } catch (error) {
+    console.log(error);
+    setQuizError("");
+    setIsGeneratingQuiz(false);
+    setPopUpOpen(false);
   }
+}
 
   // async function navToLibrary() {
   //   try {
@@ -119,7 +123,7 @@ export default function StudentLandingPage() {
         <div className="popUpOverlay">
           <div className="popUpBox">
             <p className="popUpText">Generating your quiz, please wait...</p>
-
+            
             <div className="progressBarContainer">
               <div className="progressBar"> </div>
             </div>
