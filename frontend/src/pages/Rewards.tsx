@@ -1,3 +1,5 @@
+import { useState} from "react";
+
 //Component imports
 import { Button } from '../components/button';
 
@@ -6,8 +8,45 @@ import '../styles/Rewards.css'
 import '../styles/App.css'
 
 export default function Rewards() {
+  const [popUpOpen, setPopUpOpen] = useState(false);
+  const [selectedColor, setSelectedColor] = useState<string>("");
+  const [pageBackground, setPageBackground] = useState<string>("whitesmoke");
+
+
+  const changeSkin = (color: string) => {
+    setSelectedColor(color);
+    setPopUpOpen(true);
+  };
+
+  const yesClicked = () => {
+    setPageBackground(selectedColor);
+    setPopUpOpen(false);
+  };
+
+  const noClicked = () => {
+    setPopUpOpen(false);
+  };
+
+
+
   return (
-    <div className="rewardsPage">
+    <div 
+      className="rewardsPage"
+      style={{ background: pageBackground, transition: 'background 0.5s ease' }}
+    >
+
+      {popUpOpen && (
+        <div className="popUpOverlay">
+          <div className="popUpBox">
+            <p>Are you sure you want to buy this app skin for 10 coins?</p>
+
+            <div className="popUpButtons">
+              <button onClick={yesClicked}>Yes</button>
+              <button onClick={noClicked}>No</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="container">
         <div className="topRow">
@@ -29,9 +68,18 @@ export default function Rewards() {
             <h2>Store</h2>
 
             <div className="storeItemsRow">
-              <Button className="storeItem"> Dark app skin: 10 coins</Button>
-              <Button className="storeItem"> Neon app skin: 10 coins </Button>
-              <Button className="storeItem">  Jungle app skin: 20 coins </Button>
+              <Button className="storeItem" onClick={() => changeSkin("linear-gradient(180deg, #567d46, #3b5e34, #283c22, #1e261d)")} > 
+                Jurassic Jungle Skin: 10 coins
+              </Button>
+
+              <Button className="storeItem" onClick={() => changeSkin("linear-gradient(to bottom right, #3e0000, #800000, #ff4500)")}> 
+                Dragon Fire Skin: 10 coins 
+              </Button>
+
+              <Button className="storeItem" onClick={() => changeSkin("linear-gradient(180deg, #FF9A9E, #FECFEF, #E0C3FC)")}>  
+                Candy Kingdom Skin: 10 coins 
+              </Button>
+
             </div>
 
           </div>
