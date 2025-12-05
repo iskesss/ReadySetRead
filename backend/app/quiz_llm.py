@@ -1,6 +1,7 @@
 # app/quiz_llm.py
 import json
 import os
+import random
 from typing import List, TypedDict
 
 from openai import OpenAI
@@ -186,6 +187,17 @@ def generate_quiz_for_book(
     
     for q in questions:
         q.setdefault("type", "multiple_choice")                     # ensure each question has a "type" field, defaulting to "multiple_choice"
+        
+        # shuffle the answer options so the correct answer isn't always in the same position
+        if q.get("options") and q.get("correct_answer"):
+            options = q["options"]
+            correct = q["correct_answer"]
+            
+            random.shuffle(options)
+            
+            # update the question with shuffled options
+            q["options"] = options
+            # correct_answer remains the same, since it is checking the str
 
     return questions
 
@@ -220,7 +232,6 @@ def generate_quiz_feedback(
 
     total_questions = len(questions)
 
-    # build prompt for feedback generation
     system_prompt = (
         "You are a kind but honest reading tutor for elementary school students "
         "(grades K-6).\n\n"
@@ -240,43 +251,30 @@ def generate_quiz_feedback(
         "- If a student answer is a single letter like 'A', 'B', 'C', or 'D', treat "
         "  it as choosing options[0], options[1], options[2], or options[3].\n"
         "- Mark each question as correct or incorrect based on this comparison.\n\n"
-        "Your job is to generate brief feedback for the student that:\n"
-        "- Speaks directly to the student in a friendly, encouraging tone.\n"
-        "- Is honest about what they need to improve, but never harsh or discouraging.\n"
-        "- Focuses mostly on patterns in what they got WRONG (for example, trouble "
-        "  with figuring out why characters did things, understanding how events are "
-        "  connected, remembering details about characters or places, or understanding "
-        "  the big lesson/theme).\n"
-        "- Also briefly mentions 1-2 things they did WELL (for example, remembering "
-        "  key events, understanding the main problem and solution, or knowing what "
-        "  happened first/next/last).\n"
-        "- Uses simple, age-appropriate language for K-6 students.\n"
-        "- Avoids repeating every question or listing each missed question by number. "
-        "  Instead, summarize the main patterns you see.\n\n"
-        "Feedback content guidelines:\n"
-        "- Start with a short positive opening that praises the student's effort and, "
-        "  if possible, mentions how many they got right out of the total.\n"
-        "- In 2-4 sentences, explain what the student needs to work on, based on the "
-        "  types of questions they missed. Use clear, kid-friendly language about "
-        "  skills like:\n"
-        "  - remembering facts from the story\n"
-        "  - understanding why something happened (cause and effect)\n"
-        "  - paying attention to how characters feel or what they learn\n"
-        "  - noticing how the story changes from the beginning to the end\n"
-        "- Include 1-3 simple, concrete suggestions the student can try next time "
-        "  (for example: \"slow down and reread the part where the problem gets "
-        "  solved,\" \"pay attention to how the main character is feeling,\" or "
-        "  \"look back at earlier pages if you forget why something happened\").\n"
-        "- End with a short, encouraging closer that reinforces a growth mindset, "
-        "  such as reminding them that they can improve with practice.\n\n"
+        "Your job is to generate 3-4 sentences of detailed feedback:\n"
+        "1. First sentence: Tell the student how they did on the quiz (mention how "
+        "   many they got correct out of the total).\n"
+        "2. Following sentences: Provide specific feedback about what they need to work on, "
+        "   including:\n"
+        "   - Mention specific reading skills they struggled with (e.g., understanding "
+        "     character motivations, identifying cause and effect, remembering key story "
+        "     details, understanding character relationships, or recognizing themes).\n"
+        "   - Reference specific parts of the story where they had trouble (beginning, "
+        "     middle, or end) if there's a clear pattern.\n"
+        "   - Give concrete examples when possible (e.g., 'You had trouble with questions "
+        "     about why characters made certain choices' or 'Try to pay closer attention "
+        "     to what happens at the beginning of the story').\n\n"
         "Style and format:\n"
-        "- Write as if you are talking directly to the student (use \"you\").\n"
-        "- Keep sentences short and clear.\n"
-        "- You may use short paragraphs or bullet points, but the entire response "
+        "- Speak directly to the student (use \"you\").\n"
+        "- Use simple, age-appropriate language for K-6 students.\n"
+        "- Be encouraging but honest.\n"
+        "- Output must be plain text (a single string), not JSON.\n"
+        "- Aim for 3-4 sentences that provide specific, actionable feedback.\n"
+        "- Do not mention that you are an AI or reference the quiz JSON structure; the entire response "
         "  must be plain text (a single long string), not JSON.\n"
-        "- Do not mention that you are an AI or reference the quiz JSON structure; "
-        "  just give the feedback.\n"
+        "- Just give the feedback.\n"
     )
+
 
     # format the results for the LLM
     results_text = f"The child answered {num_correct} out of {total_questions} questions correctly.\n\nHere are the details:\n\n"
@@ -303,7 +301,7 @@ def generate_quiz_feedback(
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},
         ],
-        max_tokens=250, # keeps feedback concise enough to fit in our PostgreSQL DB
+        max_tokens=250, 
     )
 
     feedback = response.choices[0].message.content.strip()

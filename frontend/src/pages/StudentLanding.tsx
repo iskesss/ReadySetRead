@@ -70,6 +70,8 @@ export default function StudentLandingPage() {
     fetchData()
   }, [])
 
+
+
   //When take quiz button clicked
   async function takeQuiz(book: BookType) {
     try {
@@ -84,13 +86,16 @@ export default function StudentLandingPage() {
         reading_level: book.level.toString(),
         num_questions: 10,
       });
-      const quiz_id = book.quiz_id
+      const quiz_id = book.quiz_id;
+
       setPopUpOpen(false);
+      setIsGeneratingQuiz(false);
+
       navigate('/quiz', {
-        state: { quizData, quiz_id }
+        state: { quizData, quiz_id },
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       setQuizError("");
       setIsGeneratingQuiz(false);
       setPopUpOpen(false);

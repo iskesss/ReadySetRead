@@ -41,8 +41,12 @@ export default function Quiz() {
       setScore(newScore);
 
       if (isLastQuestion) {
+        setPopUpOpen(true);
+        
         //Wait for quiz completion data to be sent
         await sendQuizUpdate(newScore)
+
+        setPopUpOpen(false);
 
         //Navigate to results page once backend update is done
         console.log("Navigating to results page")
@@ -67,7 +71,9 @@ export default function Quiz() {
       currentQuestionIndex === quizData.questions.length - 1;
 
     if (lastQuestion) {
+      setPopUpOpen(true);
       await sendQuizUpdate(score);
+      setPopUpOpen(false);
       navigate('/quizResults', {
         state: {
           quiz_id: quiz_id,
@@ -147,8 +153,26 @@ export default function Quiz() {
               {isLastQuestion ? 'Finish Quiz' : 'Next Question'}
             </Button>
           )}
+
         </div>
       </div>
+
+
+      {popUpOpen && (
+        <div className="popUpOverlay">
+          <div className="popUpBox">
+            <p style={{ fontWeight: 'bold', color: '#1D2951' }}>
+              Processing your results...
+            </p>
+            <div className="progressBarContainer">
+              <div className="progressBar"></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
     </div>
   );
 }
