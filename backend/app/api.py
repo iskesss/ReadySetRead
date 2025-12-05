@@ -106,7 +106,7 @@ class QuizOut(BaseModel):
     attempted: bool
     passed: bool
     score: int
-    feedback: str
+    feedback: str | None = None
 
 
 class QuizFeedbackOut(BaseModel):
@@ -679,7 +679,7 @@ async def update_quiz_result(
             # commit the transaction to the DB
             await db_connection.commit()
 
-            return QuizUpdateOut(quizOut=QuizOut(**updated_quiz), coinsEarned=coins_to_add)
+            return QuizUpdateOut(quiz_out=QuizOut(**updated_quiz), coinsEarned=coins_to_add)
 
 
 @router.post("/quiz/update-feedback")
