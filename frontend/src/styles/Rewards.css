@@ -92,7 +92,7 @@
   width: 100%;
   margin: 8px 0;
   background: #ffa157;
-  color: white;
+  color: #fef6e4;
   border: none;
   border-radius: 12px;
   padding: 14px;
@@ -135,7 +135,7 @@
   margin: 0 !important;
   min-height: 100px;
   /*background-color: var(--spaceCadet);*/
-  color: white;
+  color: #fef6e4;
   border: none;
   border-radius: 8px;
   font-weight: 600;
