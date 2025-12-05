@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { generateQuiz } from '../api/quiz';
+import '../styles/library.css';
 import '../styles/LibraryBook.css';
 
 //Component Imports
 import StudentLandingBook from '../components/StudentLandingBook';
+import ProgressPieChart from '../components/progresschart';
 
 //Api imports
 import { getCurrentStudent, listAllQuizAssignments } from '../api/students';
@@ -102,8 +104,8 @@ export default function StudentLandingPage() {
   //   }
   // }
 
-  const passedCount = studentAssignments.filter(a => a.passed).length;
-  const incompleteCount = studentAssignments.filter(a => !a.passed).length;
+  const passedCount = studentAssignments.filter((a) => a.passed).length;
+  const incompleteCount = studentAssignments.filter((a) => !a.passed).length;
 
   return (
     <div className="studentLandingContainer">
@@ -153,14 +155,14 @@ export default function StudentLandingPage() {
         </div>
 
         {/* right: progress card only on this page */}
-        <div
-          className="progressReportCard"
+        <div 
+        className="progressReportCard"
         >
           <h2>Progress Report</h2>
-          <div className="progressStats">
-            <div>{passedCount} passed</div>
-            <div>{incompleteCount} incomplete</div>
-          </div>
+          <ProgressPieChart
+            passed={passedCount}
+            incomplete={incompleteCount}
+          />
         </div>
       </div>
 
@@ -176,5 +178,5 @@ export default function StudentLandingPage() {
       )}
     </div>
   );
-
+  
 }
