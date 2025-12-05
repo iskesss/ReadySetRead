@@ -20,7 +20,25 @@ export default function Rewards() {
   const [myId, setMyId] = useState<number>()
   const [numCoins, setNumCoins] = useState<number>()
   const [customRewards, setCustomRewards] = useState<CustomReward[]>([])
-  const [rewardRedeemed] = useState<boolean[]>([false]);
+  const [rewardRedeemed, setRewardRedeemed] = useState<boolean[]>([]);
+
+  const appSkins = {
+    jurassicJungle: {
+      name: "Jurassic Jungle Skin",
+      cost: 10,
+      gradient: "linear-gradient(180deg, #567d46, #3b5e34, #283c22, #1e261d)"
+    },
+    dragonFire: {
+      name: "Dragon Fire Skin",
+      cost: 10,
+      gradient: "linear-gradient(to bottom right, #3e0000, #800000, #ff4500)"
+    },
+    candyKingdom: {
+      name: "Candy Kingdom Skin",
+      cost: 10,
+      gradient: "linear-gradient(180deg, #FF9A9E, #FECFEF, #E0C3FC)"
+    }
+  };
 
   const changeSkin = (color: string) => {
     setSelectedColor(color);
@@ -72,7 +90,8 @@ export default function Rewards() {
         if (myId) {
           const request: ListCustomRewardsRequest = { child_id: myId };
           const result = await listCustomRewards(request)
-          setCustomRewards(result.custom_rewards)
+          setCustomRewards(result)
+          console.log("Got Custom rewards: ", result)
         }
       } catch (error) {
         console.error('Error: getting custom rewards', error)
@@ -95,19 +114,38 @@ export default function Rewards() {
 
 
   //When redeem custom rewards is clicked
-  async function redeemCustomRewardClicked(reward_id: number, reward_index: number) {
+  async function redeemCustomRewardClicked(reward_id: number, reward_index: number, cost: number) {
     try {
       if (myId && reward_id) {
         const request: RedeemCustomRewardRequest = { child_id: myId, reward_id: reward_id }
         const result = await redeemCustomReward(request)
+        // if (result.success) {
+        //   const request: SpendCoinsRequest = { coins_to_spend: cost }
+        //   const spendResult = await spendCoins(request)
+        //   console.log("Did we succeed spending coins: ", spendResult.message)
+        // }
 
-        rewardRedeemed[reward_index] = true
+        // Update the rewardRedeemed array to re render for ui change
+        setRewardRedeemed(prev => {
+          const newRedeemed = [...prev];
+          newRedeemed[reward_index] = true;
+          return newRedeemed;
+        });
+
+        // Update coin count
+        if (result.success && result.remaining_coins !== undefined) {
+          setNumCoins(result.remaining_coins);
+        }
 
         return result
       }
     } catch (error) {
-      console.log('Error redeeming custom reward: ', error)
+      console.log('Error redeeming custom reward: ', error, cost)
     }
+  }
+
+  async function storeItemClicked(skinGradient: string) {
+    changeSkin(skinGradient)
   }
 
 
@@ -139,18 +177,18 @@ export default function Rewards() {
 
           <div className="card parentCard">
             <h2>Parent Incentives</h2>
-            {customRewards.map((customReward, index) => {
+            {customRewards?.map((option, index) => {
               return (
                 <Button
-                  onClick={() => redeemCustomRewardClicked(customReward.reward_id, index)}
+                  onClick={() => redeemCustomRewardClicked(option.reward_id, index, option.coin_cost)}
                   className="miniReward"
                   style={rewardRedeemed[index] ? { backgroundColor: 'green' } : {}}
                 >
-                  {customReward.description} : {customReward.coin_cost} coins
+                  {option.description} : {option.coin_cost} coins
                 </Button>
               )
             })}
-            <Button className="miniReward">Ice cream: 25 coins</Button>
+            {/* <Button className="miniReward">Ice cream: 25 coins</Button> */}
           </div>
         </div>
 
@@ -159,21 +197,15 @@ export default function Rewards() {
             <h2>Store</h2>
 
             <div className="storeItemsRow">
-              <Button className="storeItem" onClick={() => changeSkin("linear-gradient(180deg, #567d46, #3b5e34, #283c22, #1e261d)")} >
-                Jurassic Jungle Skin: 10 coins
-              </Button>
-
-              <Button className="storeItem" onClick={() => changeSkin("linear-gradient(to bottom right, #3e0000, #800000, #ff4500)")}>
-                Dragon Fire Skin: 10 coins
-              </Button>
-
-              <Button
-                className="storeItem"
-                onClick={() => changeSkin("linear-gradient(180deg, #FF9A9E, #FECFEF, #E0C3FC)")}
-              /*style={{ backgroundColor: "linear-gradient(180deg, #FF9A9E, #FECFEF, #E0C3FC)" }}*/
-              >
-                Candy Kingdom Skin: 10 coins
-              </Button>
+              {Object.entries(appSkins).map(([key, skin]) => (
+                <Button
+                  key={key}
+                  className="storeItem"
+                  onClick={() => storeItemClicked(skin.gradient)}
+                >
+                  {skin.name}: {skin.cost} coins
+                </Button>
+              ))}
 
             </div>
 

@@ -72,28 +72,38 @@
 }
 
 .goalRow {
+  display: flex;       
+  align-items: center; 
+  gap: 10px;           
   margin-bottom: 20px;
 }
 
 .progressBar {
-  width: 100%;
-  height: 15px;
-  background-color: #fff8e1;
+  width: 100%;         
+  height: 15px;      
   border-radius: 10px;
-  margin-top: 6px;
+  background-color: #fff8e1;
   overflow: hidden;
+  animation: none !important; 
 }
 
 .progressBarFill {
   height: 100%;
   background-color: var(--spaceCadet);
   border-radius: 10px;
+  width: 50%;               
 }
 
 .goalButtons {
   display: flex;
   gap: 10px;
   margin: 15px 0 25px;
+}
+
+.goalItem{
+  min-width: 70px; 
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .summarizedStats {
@@ -124,6 +134,8 @@
 .booksCard span,
 .booksCard strong {
   color: var(--spaceCadet) !important;
+  margin-top: 0;
+  margin-bottom: 15px;
 }
 
 .bookList {
