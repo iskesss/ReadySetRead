@@ -1,11 +1,3 @@
-/* The grid holding library book cards */
-.libraryGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  width: 100%;
-}
-
 /* An individual book card */
 .libraryBookCard {
   display: flex;
@@ -14,12 +6,24 @@
   text-align: center;
   height: 320px;
   padding: 24px;
-  background: linear-gradient(135deg, #ffb470, #ffa157);
+  
   border-radius: 20px;
   border: none;
   outline: 2px solid rgba(255, 255, 255, 0.35);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.libraryBookCard.incompleteCard {
+  background: linear-gradient(135deg, #ffb470, #ffa157);
+  outline-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 6px 18px rgba(255, 140, 0, 0.35);
+}
+
+.libraryBookCard.passedCard {
+  background: linear-gradient(135deg, #b8f1cc, #48bb78);
+  outline-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 6px 18px rgba(183, 238, 209, 0.35);
 }
 
 .libraryBookCard:hover {
@@ -64,11 +68,4 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
-
-/* incomplete book changes background in both lib and homepage not sure if this works will check when backend is done */
-.incompleteCard {
-  background: linear-gradient(135deg, #ffd28a, #ffb66b) !important;
-  outline-color: rgba(255, 255, 255, 0.45);
-  box-shadow: 0 6px 18px rgba(255, 140, 0, 0.3);
 }
