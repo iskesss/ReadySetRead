@@ -60,6 +60,10 @@
   box-sizing: border-box;
 }
 
+.progressCard h1 {
+  margin-bottom: 30px;
+}
+
 /* kinda funky setup was fighting something*/
 .progressCard,
 .progressCard * {
@@ -111,7 +115,8 @@
 .summarizedStats {
   margin-top: 20px;
   padding-top: 10px;
-  border-top: 1px solid #ccc;
+  border-top: 3px solid var(--spaceCadet);
+  
 }
 
 /* right side of box -- books read */
@@ -135,7 +140,7 @@
 .booksCard p,
 .booksCard span,
 .booksCard strong {
-  color: var(--spaceCadet) !important;
+  color: var(--spaceCadet);
   margin-top: 0;
   margin-bottom: 15px;
 }
