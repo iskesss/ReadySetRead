@@ -55,6 +55,26 @@ export interface GetQuizFeedbackRequest {
   quiz_id: number
 }
 
+export interface GetCoinsRequest {
+  child_id: number
+}
+
+export interface CreateCustomRewardRequest {
+  child_id: number
+  description: string
+  coin_cost: number
+  adult_email: string
+}
+
+export interface ListCustomRewardsRequest {
+  child_id: number
+}
+
+export interface RedeemCustomRewardRequest {
+  child_id: number
+  reward_id: number
+}
+
 // =============================
 // API Response Types
 // =============================
@@ -131,6 +151,29 @@ export interface UpdateQuizFeedbackResponse {
 export interface QuizFeedbackResponse {
   quiz_id: number;
   feedback: string;
+}
+
+export interface GetCoinsResponse {
+  child_id: number
+  num_coins: number
+}
+
+export interface CustomReward {
+  reward_id: number
+  child_id: number
+  description: string
+  coin_cost: number
+  adult_email: string
+}
+
+export interface ListCustomRewardsResponse {
+  custom_rewards: CustomReward[]
+}
+
+export interface RedeemCustomRewardResponse {
+  success: boolean
+  remaining_coins: number
+  message: string
 }
 
 // Error Response Type

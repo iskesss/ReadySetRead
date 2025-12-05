@@ -109,7 +109,7 @@ export default function Quiz() {
             Quit
           </Button>
         </Link>
-        <h2>Current Score: {score}/{currentQuestionIndex}</h2>
+        <h2>Current Score: {score}</h2>
         <div className='quiz-progress-bar'>
           <div
             className='quiz-progress-fill'

@@ -4,8 +4,8 @@ import type {
     ParentLoginRequest,
     ParentResponse,
     TokenResponse,
-    ChildOut,
-    AdultOut
+    Child,
+    Adult
 } from "./types";
 
 // Register / signup a new parent
@@ -41,14 +41,14 @@ export function logoutParent(): void {
 }
 
 // Get the current parent's linked student accounts
-export async function getStudents(): Promise<ChildOut[]> {
+export async function getStudents(): Promise<Child[]> {
     const parent = await getCurrentParent();
-    const response = await api.get<ChildOut[]>(`/adult/${parent.adult_email}/children`);
+    const response = await api.get<Child[]>(`/adult/${parent.adult_email}/children`);
     return response.data;
 }
 
 // Get my (current user) info
-export async function getMe(): Promise<AdultOut> {
-    const response = await api.get<AdultOut>('adult/me');
+export async function getMe(): Promise<Adult> {
+    const response = await api.get<Adult>('adult/me');
     return response.data
 }

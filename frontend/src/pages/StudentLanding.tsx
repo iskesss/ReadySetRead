@@ -70,11 +70,12 @@ export default function StudentLandingPage() {
     fetchData()
   }, [])
 
+  //When take quiz button clicked
   async function takeQuiz(book: BookType) {
     try {
-      if(isGeneratingQuiz) return;
+      if (isGeneratingQuiz) return;
       setIsGeneratingQuiz(true);
-      setPopUpOpen(true); 
+      setPopUpOpen(true);
       setQuizError(null);
 
       const quizData = await generateQuiz({
@@ -114,7 +115,7 @@ export default function StudentLandingPage() {
 
   return (
     <div className="studentLandingContainer">
-      
+
       {popUpOpen && (
         <div className="popUpOverlay">
           <div className="popUpBox">
@@ -123,11 +124,11 @@ export default function StudentLandingPage() {
             <div className="progressBarContainer">
               <div className="progressBar"> </div>
             </div>
-          
+
           </div>
         </div>
       )}
-      
+
       <div
         style={{
           display: "flex",
@@ -175,8 +176,8 @@ export default function StudentLandingPage() {
         </div>
 
         {/* right: progress card only on this page */}
-        <div 
-        className="progressReportCard"
+        <div
+          className="progressReportCard"
         >
           <h2>Progress Report</h2>
           <ProgressPieChart
@@ -198,5 +199,5 @@ export default function StudentLandingPage() {
       )}
     </div>
   );
-  
+
 }
