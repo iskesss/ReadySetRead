@@ -12,8 +12,8 @@ import '../styles/App.css'
 import { getCurrentParent, getStudents } from '../api/parents';
 import { listAllQuizAssignments } from '../api/students';
 import { getAllBooks } from '../api/books'
-import { createCustomReward } from '../api/rewards';
-import type { ParentResponse, Child, Book, Assignment, CreateCustomRewardRequest } from "../api/types"
+import { createCustomReward, getNumCoins } from '../api/rewards';
+import type { ParentResponse, Child, Book, Assignment, CreateCustomRewardRequest, GetCoinsRequest } from "../api/types"
 
 export default function ParentProgress() {
   const navigate = useNavigate();
@@ -23,8 +23,10 @@ export default function ParentProgress() {
   const [selectedChild, setSelectedChild] = useState<Child>();
   const [books, setBooks] = useState<Book[]>([]);
   const [bookAssignments, setBookAssignments] = useState<Assignment[]>([])
+  const [numCoins, setNumCoins] = useState<number>()
 
   const [popUpOpen, setPopUpOpen] = useState(false);
+  const [goalSubmitted, setGoalSubmitted] = useState(false);
 
   const [goalText, setGoalText] = useState("");
   const [goalCoins, setGoalCoins] = useState<string>("");
@@ -90,12 +92,30 @@ export default function ParentProgress() {
     fetchData()
   }, [selectedChild])
 
+  // ON selectedChild UPDATE: Get this student's coins
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (selectedChild?.child_id) {
+          const request: GetCoinsRequest = { child_id: selectedChild.child_id };
+          const result = await getNumCoins(request)
+          setNumCoins(result.num_coins)
+        }
+      } catch (error) {
+        console.error('Error getting list of student quiz assignments: ', error)
+      }
+    }
+    fetchData()
+  }, [selectedChild])
+
   async function navToLibrary() {
     if (!selectedChild) return;
-    // sessionStorage.setItem('targetStudentId', JSON.stringify(selectedChild.child_id));
     sessionStorage.setItem('meType', JSON.stringify('parent'));
     navigate('/library');
   }
+
+  const passedCount = bookAssignments.filter((a) => a.passed).length;
+  const incompleteCount = bookAssignments.filter((a) => !a.passed).length;
 
   return (
     <div className='parentProgressContainer'>
@@ -155,9 +175,10 @@ export default function ParentProgress() {
 
           {/* LINK to backend for stats for each kid  */}
           <div className="summarizedStats">
-            <h3> Overall stats </h3>
-            <p> Total completed: 0 </p>
-            <p> Coins: 0 </p>
+            <h2> Overall stats </h2>
+            <h4> Book Quizzes Passed: {passedCount} </h4>
+            <h4> Book Quizzes Incomplete: {incompleteCount} </h4>
+            <h4> Coins: {numCoins} </h4>
           </div>
         </div>
 
@@ -199,72 +220,83 @@ export default function ParentProgress() {
         <div className="popUpOverlay">
           <div className="popUpBox">
 
-            <h3>Add Goal</h3>
+            {goalSubmitted ? (
+              <h3>Added successfully!</h3>
+            ) : (
+              <>
+                <h3>Add Goal</h3>
 
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
 
-                // Basic client-side validation
-                if (!goalText.trim()) {
-                  alert("Please enter a goal name.");
-                  return;
-                }
-                if (goalCoins === "" || Number(goalCoins) <= 0) {
-                  alert("Please enter a valid number of coins ( > 0 ).");
-                  return;
-                }
-
-                // Save action: for now, just log and close.
-                // TODO: call backend or update local state to persist.
-                try {
-                  if (selectedChild && me) {
-                    const request: CreateCustomRewardRequest = {
-                      child_id: selectedChild.child_id,
-                      description: goalText,
-                      coin_cost: Number(goalCoins),
-                      adult_email: me.adult_email
+                    // Basic client-side validation
+                    if (!goalText.trim()) {
+                      alert("Please enter a goal name.");
+                      return;
                     }
-                    const result = await createCustomReward(request)
-                    console.log(result)
-                  }
-                } catch (error) {
-                  console.log("error creating custom reward: ", error)
-                }
+                    if (goalCoins === "" || Number(goalCoins) <= 0) {
+                      alert("Please enter a valid number of coins ( > 0 ).");
+                      return;
+                    }
 
-                console.log("Saving goal:", { goalText, goalCoins: Number(goalCoins), childId: selectedChild?.child_id });
+                    try {
+                      if (selectedChild && me) {
+                        const request: CreateCustomRewardRequest = {
+                          child_id: selectedChild.child_id,
+                          description: goalText,
+                          coin_cost: Number(goalCoins),
+                          adult_email: me.adult_email
+                        }
+                        const result = await createCustomReward(request)
+                        console.log(result)
+                      }
+                    } catch (error) {
+                      console.log("error creating custom reward: ", error)
+                      return;
+                    }
 
-                // Reset form + close
-                setGoalText("");
-                setGoalCoins("");
-                setPopUpOpen(false);
-              }}
-              style={{ display: "flex", flexDirection: "column", gap: 10 }}
-            >
-              <label>Goal:</label>
-              <input
-                type="text"
-                value={goalText}
-                onChange={(e) => setGoalText(e.target.value)}
-                required
-              />
+                    console.log("Saving goal:", { goalText, goalCoins: Number(goalCoins), childId: selectedChild?.child_id });
 
-              <label>Coins:</label>
-              <input
-                type="number"
-                value={goalCoins}
-                onChange={(e) => setGoalCoins(e.target.value)}
-                required
-                min={1}
-              />
+                    // show success message
+                    setGoalSubmitted(true);
 
-              <div className="popUpButtons">
-                <button type="submit">Save</button>
-                <button type="button" onClick={() => { setPopUpOpen(false); }}>
-                  Cancel
-                </button>
-              </div>
-            </form>
+                    // wait 2 seconds then close and reset
+                    setTimeout(() => {
+                      setGoalText("");
+                      setGoalCoins("");
+                      setGoalSubmitted(false);
+                      setPopUpOpen(false);
+                    }, 2000);
+                  }}
+                  style={{ display: "flex", flexDirection: "column", gap: 10 }}
+                >
+                  <label>Goal:</label>
+                  <input
+                    type="text"
+                    value={goalText}
+                    onChange={(e) => setGoalText(e.target.value)}
+                    required
+                  />
+
+                  <label>Coins:</label>
+                  <input
+                    type="number"
+                    value={goalCoins}
+                    onChange={(e) => setGoalCoins(e.target.value)}
+                    required
+                    min={1}
+                  />
+
+                  <div className="popUpButtons">
+                    <button type="submit">Save</button>
+                    <button type="button" onClick={() => { setPopUpOpen(false); }}>
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
           </div>
         </div>
       )}

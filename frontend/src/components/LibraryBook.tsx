@@ -7,7 +7,7 @@ import "../styles/LibraryBook.css"
 
 type LibraryBookProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     title: string;
-    status: 'passed' | 'incomplete';
+    status: 'passed' | 'incomplete' | 'unassigned';
     level: number;
     added: boolean;
     onAdd: () => void;
@@ -18,7 +18,9 @@ type LibraryBookProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 export const LibraryBook = forwardRef<HTMLButtonElement, LibraryBookProps>(
     ({ title, status, level, added, onAdd }) => {
         const statusClass =
-            status === 'passed' ? 'passedCard' : 'incompleteCard';
+            status === 'passed' ? 'passedCard' :
+            status === 'incomplete' ? 'incompleteCard' :
+            'unassignedCard';
 
         return (
             <div className={`libraryBookCard ${statusClass}`}>

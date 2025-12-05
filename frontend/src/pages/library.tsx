@@ -11,16 +11,18 @@ import { LibraryBook } from "../components/LibraryBook"
 import '../styles/library.css'
 
 // API imports
-import type { Book } from "../api/types"
+import type { Book, Assignment } from "../api/types"
 import { getAllBooks, createAssignment } from '../api/books';
+import { listAllQuizAssignments } from '../api/students';
 
 
 export default function Library() {
     const navigate = useNavigate()
     const [books, setBooks] = useState<Book[]>([]);
+    const [studentAssignments, setStudentAssignments] = useState<Assignment[]>([])
     const [targetStudentId, setTargetStudentId] = useState<number | null>(null);
     const [meType, setMeType] = useState<string | null>(null);
-    const [added] = useState<boolean[]>([false]);
+    const [added, setAdded] = useState<boolean[]>([]);
     // const navigate = useNavigate();
     const [error, setError] = useState<string | null>(null);
 
@@ -42,6 +44,8 @@ export default function Library() {
                 const result = await getAllBooks();
                 console.log("Successfully retrieved all books");
                 setBooks(result);
+                // initialize added array to false
+                setAdded(new Array(result.length).fill(false));
             } catch (error) {
                 console.error("Error with books api call", error);
                 setError(String(error));
@@ -49,6 +53,21 @@ export default function Library() {
         }
         fetchData()
     }, [])
+
+    // ON PAGE LOAD: get the target student's assignments so we can get statuses
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                if (targetStudentId) {
+                    const result = await listAllQuizAssignments(targetStudentId)
+                    setStudentAssignments(result)
+                }
+            } catch (error) {
+                console.error('Error getting quiz assignments: ', error)
+            }
+        }
+        fetchData()
+    }, [targetStudentId])
 
     const handleAddBook = (book_id: number, index: number) => {
         const postToDB = async () => {
@@ -59,7 +78,12 @@ export default function Library() {
             try {
                 const result = await createAssignment({ child_id: targetStudentId, book_id: book_id })
                 console.log(result)
-                added[index] = true
+                // Update the added array to trigger re render
+                setAdded(prev => {
+                    const newAdded = [...prev];
+                    newAdded[index] = true;
+                    return newAdded;
+                });
             } catch (error) {
                 setError(String(error))
                 return
@@ -90,15 +114,26 @@ export default function Library() {
                 )}
 
                 <div className='libraryGrid'>
-                    {books.map((option, index) => (
-                        <LibraryBook
-                            title={option.title}
-                            status='incomplete' // need a different route to handle this
-                            level={option.reading_level}
-                            added={added[index]}
-                            onAdd={() => handleAddBook(Number(option.book_id), index)}
-                        />
-                    ))}
+                    {books.map((option, index) => {
+                        // Find matching assignment to derive status
+                        const assignment = studentAssignments.find(
+                            (a) => a.book_id === Number(option.book_id)
+                        );
+                        const status = assignment
+                            ? (assignment.passed ? 'passed' : 'incomplete')
+                            : 'unassigned';
+
+                        return (
+                            <LibraryBook
+                                key={option.book_id}
+                                title={option.title}
+                                status={status}
+                                level={option.reading_level}
+                                added={added[index]}
+                                onAdd={() => handleAddBook(Number(option.book_id), index)}
+                            />
+                        );
+                    })}
                 </div>
             </main>
         </div>

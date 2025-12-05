@@ -50,7 +50,12 @@ export default function StudentLandingPage() {
         if (myId != null) {
           setIsLoadingAssignments(true)  //these make sure popups don't load when switching pages
           const result = await listAllQuizAssignments(myId)
-          setStudentAssignments(result)
+          // sort the assingments so that incomplete are first
+          const sortedResult = result.sort((a, b) => {
+            if (a.passed === b.passed) return 0;
+            return a.passed ? 1 : -1;
+          });
+          setStudentAssignments(sortedResult)
           setIsLoadingAssignments(false)
         }
       } catch (error) {
@@ -73,8 +78,6 @@ export default function StudentLandingPage() {
     }
     fetchData()
   }, [])
-
-
 
   //When take quiz button clicked
   async function takeQuiz(book: BookType) {
@@ -106,26 +109,13 @@ export default function StudentLandingPage() {
     }
   }
 
-  // async function navToLibrary() {
-  //   try {
-  //     const result = await getCurrentStudent();
-  //     const student_id = result.child_id;
-  //     sessionStorage.setItem('targetStudentId', JSON.stringify(student_id));
-  //     sessionStorage.setItem('meType', JSON.stringify('student'));
-  //     navigate('/library');
-  //   } catch (error) {
-  //     console.log(error)
-  //     return
-  //   }
-  // }
-
   const passedCount = studentAssignments.filter((a) => a.passed).length;
   const incompleteCount = studentAssignments.filter((a) => !a.passed).length;
 
   // function to go to library
   const goToLibrary = () => {
     if (myId === null) {
-      console.error('Student ID not available'); 
+      console.error('Student ID not available');
       return;
     }
     sessionStorage.setItem('targetStudentId', JSON.stringify(myId));
