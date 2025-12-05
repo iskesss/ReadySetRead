@@ -127,21 +127,21 @@ export default function ParentProgress() {
 
           {/* assigned goals -- MUST LINK TO BACKEND HERE -- also adjust how % caluclated*/}
           <div className="goalRow">
-            <span>Goal 1:</span>
+            <span className="goalItem">Goal 1:</span>
             <div className="progressBar">
               <div className="progressBarFill" style={{ width: "50%" }} />
             </div>
           </div>
 
           <div className="goalRow">
-            <span>Goal 2:</span>
+            <span className="goalItem">Goal 2:</span>
             <div className="progressBar">
               <div className="progressBarFill" style={{ width: "70%" }} />
             </div>
           </div>
 
           <div className="goalRow">
-            <span>Goal 3:</span>
+            <span className="goalItem">Goal 3:</span>
             <div className="progressBar">
               <div className="progressBarFill" style={{ width: "20%" }} />
             </div>
@@ -268,7 +268,6 @@ export default function ParentProgress() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
