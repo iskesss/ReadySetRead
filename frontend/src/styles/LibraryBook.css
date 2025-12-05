@@ -102,3 +102,15 @@
 }
 
 
+/* When the green skin is active, we add .progressReportCard--lightText.
+   Make all text inside the Progress Report card off-white so it pops on the dark green. */
+.progressReportCard--lightText,
+.progressReportCard--lightText * {
+  color: #fef6e4 !important;
+}
+
+/* Recharts legend uses its own class, so double-ensure it flips too */
+.progressReportCard--lightText .recharts-legend-item-text {
+  color: #fef6e4 !important;
+  fill: #fef6e4 !important;
+}

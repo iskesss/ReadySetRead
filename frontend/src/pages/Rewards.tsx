@@ -30,17 +30,17 @@ export default function Rewards() {
   const appSkins = {
     jurassicJungle: {
       name: "Jurassic Jungle Skin",
-      cost: 1,
+      cost: 10,
       gradient: "linear-gradient(180deg, #567d46, #3b5e34, #283c22, #1e261d)"
     },
     dragonFire: {
       name: "Dragon Fire Skin",
-      cost: 1,
+      cost: 10,
       gradient: "linear-gradient(to bottom right, #3e0000, #800000, #ff4500)"
     },
     candyKingdom: {
       name: "Candy Kingdom Skin",
-      cost: 1,
+      cost: 10,
       gradient: "linear-gradient(180deg, #FF9A9E, #FECFEF, #E0C3FC)"
     }
   };

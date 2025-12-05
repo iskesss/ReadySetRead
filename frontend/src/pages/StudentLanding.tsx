@@ -11,6 +11,7 @@ import ProgressPieChart from '../components/progresschart';
 //Api imports
 import { getCurrentStudent, listAllQuizAssignments } from '../api/students';
 import { getAllBooks } from '../api/books';
+import { getBackgroundSkin } from '../api/rewards';
 import type { Assignment, Book } from '../api/types';
 
 type BookType = {
@@ -30,6 +31,7 @@ export default function StudentLandingPage() {
   const [popUpOpen, setPopUpOpen] = useState(false)
   const [isLoadingAssignments, setIsLoadingAssignments] = useState(true)
   const [isLoadingBooks, setIsLoadingBooks] = useState(true)
+  const [bgSkin, setBgSkin] = useState<string>('')
 
   // ON PAGE LOAD: Get my Id
   useEffect(() => {
@@ -58,6 +60,7 @@ export default function StudentLandingPage() {
             if (a.passed === b.passed) return 0;
             return a.passed ? 1 : -1;
           });
+
           setStudentAssignments(sortedResult)
           setIsLoadingAssignments(false)
         }
@@ -84,6 +87,22 @@ export default function StudentLandingPage() {
     }
     fetchData()
   }, [])
+
+  useEffect(() => {
+    const fetchSkin = async () => {
+      try {
+        const result = await getBackgroundSkin();
+        setBgSkin(result.bg_skin);
+      } catch (error) {
+        console.error('Error getting background skin: ', error);
+      }
+    };
+    fetchSkin();
+  }, []);
+
+  const isDarkSkin =
+    bgSkin &&
+    (bgSkin.includes('#567d46') || bgSkin.includes('#3e0000'));
 
   //When take quiz button clicked
   async function takeQuiz(book: BookType) {
@@ -134,22 +153,22 @@ export default function StudentLandingPage() {
 
       {/* popup shown when no quizzes assigned */}
       {!isLoadingAssignments && !isLoadingBooks && studentAssignments.length === 0 && books.length > 0 && myId !== null && (
-        <div className="popUpOverlay">
-          <div className="popUpBox emptyStatePopup">
+          <div className="popUpOverlay">
+            <div className="popUpBox emptyStatePopup">
             <h2 className="popUpText" style={{ fontSize: '28px', marginBottom: '20px' }}>
-              Welcome to Your Dashboard!
-            </h2>
-            <p className="popUpText" style={{ fontSize: '18px', marginBottom: '30px' }}>
+                Welcome to Your Dashboard!
+              </h2>
+              <p className="popUpText" style={{ fontSize: '18px', marginBottom: '30px' }}>
               You don't have any quizzes yet. Go to the Library page to add your first quiz!
-            </p>
-            <div className="popUpButtons">
+              </p>
+              <div className="popUpButtons">
               <button onClick={goToLibrary}>
                 Go to Library
               </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* quiz generation popup */}
       {popUpOpen && (
@@ -213,7 +232,9 @@ export default function StudentLandingPage() {
 
         {/* right: progress card only on this page */}
         <div
-          className="progressReportCard"
+          className={
+            "progressReportCard" + (isDarkSkin ? ' progressReportCard--lightText' : '')
+          }
         >
           <h2>Progress Report</h2>
           <ProgressPieChart
