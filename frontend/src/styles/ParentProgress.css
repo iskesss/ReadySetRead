@@ -141,41 +141,45 @@
 }
 
 /*pop up box*/
-.popUpOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.45);
+.popUpBox form {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  backdrop-filter: blur(2px);
-  z-index: 1000;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
 }
 
-.popUpBox {
-  background: white;
-  border: 4px solid var(--spaceCadet);
-  border-radius: 20px;
-  padding: 25px 30px;
-  text-align: center;
-  width: 90%;
-  max-width: 350px;
-  box-shadow: 8px 8px 0px rgba(0,0,0,0.15);
+.popUpBox label {
+  font-weight: 700;
+  margin-bottom: 5px;
+  text-align: left;
+  color: var(--spaceCadet);
+}
+
+.popUpBox input[type="text"],
+.popUpBox input[type="number"] {
+  padding: 10px;
+  border-radius: 12px;
+  border: 2px solid var(--spaceCadet);
+  font-size: 16px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.popUpBox input[type="text"]:focus,
+.popUpBox input[type="number"]:focus {
+  border-color: var(--pumpkin);
 }
 
 .popUpButtons {
   display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 15px;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .popUpButtons button {
-  padding: 10px 20px;
-  border: none;
+  flex: 1;
+  padding: 12px 0;
   border-radius: 12px;
   font-weight: 700;
   cursor: pointer;
