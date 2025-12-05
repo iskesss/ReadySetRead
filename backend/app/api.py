@@ -141,6 +141,10 @@ class SpendCoinsResponse(BaseModel):
     remaining_coins: int
     message: str
 
+class GetCoinsResponse(BaseModel):
+    child_id: int
+    num_coins: int
+
 class GetBackgroundSkinResponse(BaseModel):
     bg_skin: str
 
@@ -741,7 +745,7 @@ async def update_quiz_feedback( # generate and then store AI feedback for a quiz
                 WHERE quiz_id = %s 
                 """,
                 (payload.quiz_id,)
-            )                                           
+            )
             quiz_row = await db_cursor.fetchone()
             if not quiz_row:
                 raise HTTPException(status_code=404, detail="Quiz not found!")
@@ -782,8 +786,39 @@ async def update_quiz_feedback( # generate and then store AI feedback for a quiz
 
             return {"message": "Feedback generated and stored successfully"}
 
-# COIN SPENDING ENDPOINT
+# COIN ENDPOINTS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
+@router.get("/child/{child_id}/coins", response_model=GetCoinsResponse) # fetch the number of coins for a specified child. this endpoint is callable by both adults and children.
+async def get_coins(
+    child_id: int,
+    current_user: AdultOut | ChildOut = Depends(get_current_user)
+):
+    pool = require_pool()
+    async with pool.connection() as db_connection:
+        db_connection.row_factory = dict_row
+        async with db_connection.cursor() as db_cursor:
+            # verify the child exists and get their info
+            await db_cursor.execute(
+                f"SELECT child_id, num_coins, adult_email FROM {CHILDREN_TABLE} WHERE child_id = %s",
+                (child_id,)
+            )
+            child_row = await db_cursor.fetchone()
+            if not child_row:
+                raise HTTPException(status_code=404, detail="Child not found!")
+
+            # auth check: children can only view their own coins, adults can only view their children's coins
+            if isinstance(current_user, ChildOut):
+                if current_user.child_id != child_id:
+                    raise HTTPException(status_code=403, detail="You can't view other kids' coins!")
+            elif isinstance(current_user, AdultOut):
+                if current_user.adult_email != child_row["adult_email"]:
+                    raise HTTPException(status_code=403, detail="You can only view your own kids' coins!")
+
+            return GetCoinsResponse(
+                child_id=child_row["child_id"],
+                num_coins=child_row["num_coins"]
+            )
+
 @router.post("/child/spend-coins", response_model=SpendCoinsResponse)
 async def spend_coins(
     payload: SpendCoinsRequest,
