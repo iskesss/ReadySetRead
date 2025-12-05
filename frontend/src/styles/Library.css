@@ -82,26 +82,28 @@ main {
 
 /*progress bar stuff*/
 
-.progressBarContainer {
+.moving_ProgressBarContainer {
   width: 100%;
   height: 12px;
-  background-color: var(--spaceCadet); 
+  border: 3px solid var(--spaceCadet);
   border-radius: 6px;
   margin-top: 15px;
-  overflow: hidden; 
+  overflow: hidden;
   position: relative;
 }
 
 
-.progressBar {
+.moving_ProgressBar {
+  width: 30%;
   height: 100%;
+  background-color: var(--pumpkin); 
   border-radius: 6px;
-  animation: loading 2s infinite ease-in-out;
+  animation: loading 2s linear infinite;
 }
 
 @keyframes loading {
-  0% { transform: translateX(-120%); }
-  100% { transform: translateX(250%); }
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
 }
 
 /* Empty state popup - larger and more prominent */

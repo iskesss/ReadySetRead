@@ -168,8 +168,8 @@ export default function Quiz() {
             <p style={{ fontWeight: 'bold', color: '#1D2951' }}>
               Processing your results...
             </p>
-            <div className="progressBarContainer">
-              <div className="progressBar"></div>
+            <div className="moving_ProgressBarContainer">
+              <div className="moving_ProgressBar"></div>
             </div>
           </div>
         </div>

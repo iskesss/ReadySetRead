@@ -151,8 +151,8 @@ export default function StudentLandingPage() {
           <div className="popUpBox">
             <p className="popUpText">Generating your quiz, please wait...</p>
 
-            <div className="progressBarContainer">
-              <div className="progressBar"> </div>
+            <div className="moving_ProgressBarContainer">
+              <div className="moving_ProgressBar"> </div>
             </div>
 
           </div>
