@@ -40,7 +40,7 @@ export async function createCustomReward(
 export async function listCustomRewards(
     data: ListCustomRewardsRequest
 ): Promise<ListCustomRewardsResponse> {
-    const response = await api.post<ListCustomRewardsResponse>(`/child/${data.child_id}/custom-rewards`)
+    const response = await api.get<ListCustomRewardsResponse>(`/child/${data.child_id}/custom-rewards`)
     return response.data
 }
 
