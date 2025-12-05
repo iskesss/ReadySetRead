@@ -11,7 +11,7 @@ import '../styles/Quiz.css'
 
 // API imports
 import type { QuizResponse } from '../api/types';
-import { updateQuiz } from '../api/quiz';
+import { updateQuiz, updateQuizFeedback } from '../api/quiz';
 
 export default function Quiz() {
 
@@ -22,32 +22,39 @@ export default function Quiz() {
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
+
   const [score, setScore] = useState(0);
+  const [child_responses] = useState<string[]>([])
 
   const currentQuestion = quizData.questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === quizData.questions.length - 1
-  const progress =((currentQuestionIndex + 1) / quizData.questions.length) * 100
+  const progress = ((currentQuestionIndex + 1) / quizData.questions.length) * 100
+
+
   const handleAnswerClick = async (selectedOption: string) => {
+    //Store student answer
+    child_responses[currentQuestionIndex] = selectedOption;
+
     if (selectedOption == quizData.questions[currentQuestionIndex].correct_answer) {
       const newScore = score + 1;
       setScore(newScore);
 
-            if (isLastQuestion) {
-                //Wait for quiz completion data to be sent
-                await sendQuizUpdate(newScore)
-                // TODO: SEND ANSWERS FOR FEEDBACK HERE
+      if (isLastQuestion) {
+        //Wait for quiz completion data to be sent
+        await sendQuizUpdate(newScore)
 
-                //Navigate to results page once backend update is done
-                navigate('/quizResults', {
-                    state: {
-                        quizData: quizData,
-                        score: newScore
-                    }
-                })
+        //Navigate to results page once backend update is done
+        navigate('/quizResults', {
+          state: {
+            quiz_id: quiz_id,
+            quizData: quizData,
+            score: newScore
+          }
+        })
       } else {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       }
-    } 
+    }
     else {
       setShowResults(true);
     }
@@ -57,7 +64,8 @@ export default function Quiz() {
     const lastQuestion =
       currentQuestionIndex === quizData.questions.length - 1;
 
-    if (lastQuestion) {await sendQuizUpdate(score);
+    if (lastQuestion) {
+      await sendQuizUpdate(score);
       navigate('/quizResults', {
         state: {
           quizData: quizData,
@@ -72,23 +80,29 @@ export default function Quiz() {
 
   async function sendQuizUpdate(newScore: number) {
     try {
-      const payload = {
+      const updateQuizPayload = {
         quiz_id: quiz_id,
         score: newScore
       }
-      await updateQuiz(payload)
+      await updateQuiz(updateQuizPayload)
+      const updateFeedbackPayload = {
+        quiz_id: quiz_id,
+        quiz_questions: quizData,
+        child_responses: child_responses
+      }
+      await updateQuizFeedback(updateFeedbackPayload)
     } catch (error) {
       console.log("Error sending quiz results to backend: ", error)
     }
   }
 
   return (
-        <div className='page-background'>
-            <div className='layout-box'>
+    <div className='page-background'>
+      <div className='layout-box'>
         <Link to='/studentLanding'>
           <Button>
             Quit
-            </Button>
+          </Button>
         </Link>
         <div className='quiz-progress-bar'>
           <div
@@ -105,14 +119,14 @@ export default function Quiz() {
 
         <div className='answer-container'>
           {!showResults && currentQuestion.options.map((option, index) => (
-              <Button
-                key={index}
-                className='answer-button'
-                onClick={() => handleAnswerClick(option)}
-              >
-                {option}
-              </Button>
-            ))}
+            <Button
+              key={index}
+              className='answer-button'
+              onClick={() => handleAnswerClick(option)}
+            >
+              {option}
+            </Button>
+          ))}
 
           {showResults && (
             <Button

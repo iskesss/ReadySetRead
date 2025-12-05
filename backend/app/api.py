@@ -591,7 +591,7 @@ async def get_quiz_stats_for_child(
 
 
 @router.get("/quiz/{quiz_id}/feedback", response_model=QuizFeedbackOut)
-async def get_quiz_feedback(quiz_id, current_user): 
+async def get_quiz_feedback(quiz_id: int, current_user: AdultOut | ChildOut = Depends(get_current_user)): 
     #return stored feedback for a quiz. adults can only access feedback for their own children, and children can only access their own quizzes
     pool = require_pool()
     async with pool.connection() as db_connection:

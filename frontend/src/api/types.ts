@@ -45,6 +45,16 @@ export interface UpdateQuizRequest {
   score: number
 }
 
+export interface UpdateQuizFeedbackRequest {
+  quiz_id: number
+  quiz_questions: QuizResponse
+  child_responses: string[]
+}
+
+export interface GetQuizFeedbackRequest {
+  quiz_id: number
+}
+
 // =============================
 // API Response Types
 // =============================
@@ -112,6 +122,15 @@ export interface Assignment { //Corresponds to QuizOut in backend
 export interface UpdateQuizResponse {
   quiz_out: Assignment;
   coinsEarned: number;
+}
+
+export interface UpdateQuizFeedbackResponse {
+  message: string;
+}
+
+export interface QuizFeedbackResponse {
+  quiz_id: number;
+  feedback: string;
 }
 
 // Error Response Type
