@@ -166,6 +166,15 @@ class CustomRewardOut(BaseModel):
     coin_cost: int
     adult_email: EmailStr
 
+class RedeemCustomRewardRequest(BaseModel):
+    child_id: int
+    reward_id: int
+
+class RedeemCustomRewardResponse(BaseModel):
+    success: bool
+    remaining_coins: int
+    message: str
+
 # JWT AUTHENTICATION HELPER FUNCTIONS
 # —_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_–_–_—_—_—_—_—_
 BCRYPT_ROUNDS = int(os.getenv("BCRYPT_ROUNDS", "12"))
@@ -937,4 +946,88 @@ async def list_custom_rewards_for_child(
             )
             rows = await db_cursor.fetchall()
             return [CustomRewardOut(**row) for row in rows]
+
+@router.post("/custom-rewards/redeem", response_model=RedeemCustomRewardResponse) # auto-spends the child's coins!
+async def redeem_custom_reward(
+    payload: RedeemCustomRewardRequest,
+    current_child: ChildOut = Depends(get_current_child)
+):
+    # verify that the child_id in the request matches the authenticated child
+    if current_child.child_id != payload.child_id:
+        raise HTTPException(
+            status_code=403,
+            detail="you can only redeem your own rewards!"
+        )
+
+    pool = require_pool()
+    async with pool.connection() as db_connection:
+        db_connection.row_factory = dict_row
+        async with db_connection.cursor() as db_cursor:
+            # fetch the custom reward to get the coin_cost and verify it belongs to the child
+            await db_cursor.execute(
+                f"""
+                SELECT reward_id, child_id, description, coin_cost, adult_email
+                FROM {CUSTOM_REWARDS_TABLE}
+                WHERE reward_id = %s
+                """,
+                (payload.reward_id,)
+            )
+            reward_row = await db_cursor.fetchone()
+            if not reward_row:
+                raise HTTPException(status_code=404, detail="Reward not found!")
+
+            # verify the reward belongs to the authenticated child
+            if reward_row["child_id"] != current_child.child_id:
+                raise HTTPException(
+                    status_code=403,
+                    detail="This reward does not  belong to you!"
+                )
+
+            coin_cost = reward_row["coin_cost"]
+
+            # fetch this kid's current coin balance
+            await db_cursor.execute(
+                f"""SELECT num_coins FROM {CHILDREN_TABLE} WHERE child_id = %s""",
+                (current_child.child_id,)
+            )
+            child_row = await db_cursor.fetchone()
+            if not child_row:
+                raise HTTPException(status_code=404, detail="Child not found!")
+
+            current_coins = child_row["num_coins"]
+
+            if current_coins < coin_cost:
+                return RedeemCustomRewardResponse(
+                    success=False,
+                    remaining_coins=current_coins,
+                    message=f"Insufficient coins! You have {current_coins} coins but need {coin_cost}."
+                )
+
+            new_balance = current_coins - coin_cost
+            await db_cursor.execute(
+                f"""
+                UPDATE {CHILDREN_TABLE}
+                SET num_coins = %s
+                WHERE child_id = %s
+                """,
+                (new_balance, current_child.child_id)
+            )
+
+            # rm the custom reward from SQL
+            await db_cursor.execute(
+                f"""
+                DELETE FROM {CUSTOM_REWARDS_TABLE}
+                WHERE reward_id = %s
+                """,
+                (payload.reward_id,)
+            )
+
+            # commit the transaction
+            await db_connection.commit()
+
+            return RedeemCustomRewardResponse(
+                success=True,
+                remaining_coins=new_balance,
+                message=f"Successfully redeemed reward! {coin_cost} coins have been deducted."
+            )
 
