@@ -8,8 +8,6 @@
 }
 
 
-
-
 .headerButtons {
   display: flex;
   justify-content: space-between;
@@ -140,4 +138,56 @@
   border: 1px solid #fff8e1;
   border-radius: 12px;
   padding: 15px;
+}
+
+/*pop up box*/
+.popUpBox form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+.popUpBox label {
+  font-weight: 700;
+  margin-bottom: 5px;
+  text-align: left;
+  color: var(--spaceCadet);
+}
+
+.popUpBox input[type="text"],
+.popUpBox input[type="number"] {
+  padding: 10px;
+  border-radius: 12px;
+  border: 2px solid var(--spaceCadet);
+  font-size: 16px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.popUpBox input[type="text"]:focus,
+.popUpBox input[type="number"]:focus {
+  border-color: var(--pumpkin);
+}
+
+.popUpButtons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.popUpButtons button {
+  flex: 1;
+  padding: 12px 0;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--pumpkin);
+  color: white;
+  transition: 0.2s ease-in-out;
+}
+
+.popUpButtons button:hover {
+  transform: scale(1.05);
 }

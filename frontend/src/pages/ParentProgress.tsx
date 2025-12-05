@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
@@ -22,6 +21,11 @@ export default function ParentProgress() {
   const [selectedChild, setSelectedChild] = useState<Child>();
   const [books, setBooks] = useState<Book[]>([]);
   const [bookAssignments, setBookAssignments] = useState<Assignment[]>([])
+
+  const [popUpOpen, setPopUpOpen] = useState(false);
+
+  const [goalText, setGoalText] = useState("");
+  const [goalCoins, setGoalCoins] = useState<string>("");
 
   // ON PAGE LOAD: Get this parent's kids
   useEffect(() => {
@@ -130,7 +134,7 @@ export default function ParentProgress() {
 
           {/* Adding goals or assigning books feature -- LINK TO OTHER pages HERE */}
           <div className="goalButtons">
-            <Button>Add goal</Button>
+            <Button onClick={() => { setGoalText(""); setGoalCoins(""); setPopUpOpen(true); }}>Add goal</Button>
             <Button onClick={navToLibrary}>Assign a book</Button>
           </div>
 
@@ -174,6 +178,67 @@ export default function ParentProgress() {
         </div>
 
       </div>
+
+
+      {popUpOpen && (
+        <div className="popUpOverlay">
+          <div className="popUpBox">
+
+            <h3>Add Goal</h3>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+
+                // Basic client-side validation
+                if (!goalText.trim()) {
+                  alert("Please enter a goal name.");
+                  return;
+                }
+                if (goalCoins === "" || Number(goalCoins) <= 0) {
+                  alert("Please enter a valid number of coins ( > 0 ).");
+                  return;
+                }
+
+                // Save action: for now, just log and close.
+                // TODO: call backend or update local state to persist.
+                console.log("Saving goal:", { goalText, goalCoins: Number(goalCoins), childId: selectedChild?.child_id });
+
+                // Reset form + close
+                setGoalText("");
+                setGoalCoins("");
+                setPopUpOpen(false);
+              }}
+              style={{ display: "flex", flexDirection: "column", gap: 10 }}
+            >
+              <label>Goal:</label>
+              <input
+                type="text"
+                value={goalText}
+                onChange={(e) => setGoalText(e.target.value)}
+                required
+              />
+
+              <label>Coins:</label>
+              <input
+                type="number"
+                value={goalCoins}
+                onChange={(e) => setGoalCoins(e.target.value)}
+                required
+                min={1}
+              />
+
+              <div className="popUpButtons">
+                <button type="submit">Save</button>
+                <button type="button" onClick={() => { setPopUpOpen(false); }}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
