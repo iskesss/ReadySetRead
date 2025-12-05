@@ -61,11 +61,7 @@
 /* kinda funky setup was fighting something*/
 .progressCard,
 .progressCard * {
-  color: #1E1B4B !important;
-}
-.progressCard *,
-.progressCard {
-  color: #1E1B4B !important;
+ color: var(--spaceCadet) !important;
 }
 
 .progressCard button,
@@ -113,6 +109,19 @@
   padding: 25px;
   border-radius: 20px;
   box-sizing: border-box;
+}
+
+/*similair thing this was the only way i got to work*/
+.booksCard h1,
+.booksCard h2,
+.booksCard h3,
+.booksCard h4,
+.booksCard h5,
+.booksCard h6,
+.booksCard p,
+.booksCard span,
+.booksCard strong {
+ color: var(--spaceCadet) !important;
 }
 
 .bookList {
