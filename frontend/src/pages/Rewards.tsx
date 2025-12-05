@@ -8,9 +8,9 @@ import '../styles/Rewards.css'
 import '../styles/App.css'
 
 //Api imports
-import { getNumCoins, listCustomRewards, redeemCustomReward, spendCoins } from "../api/rewards";
+import { getNumCoins, listCustomRewards, redeemCustomReward } from "../api/rewards";
 import { getCurrentStudent } from "../api/students";
-import type { CustomReward, GetCoinsRequest, ListCustomRewardsRequest, RedeemCustomRewardRequest, SpendCoinsRequest } from "../api/types";
+import type { CustomReward, GetCoinsRequest, ListCustomRewardsRequest, RedeemCustomRewardRequest } from "../api/types";
 
 export default function Rewards() {
   const [popUpOpen, setPopUpOpen] = useState(false);
@@ -20,7 +20,7 @@ export default function Rewards() {
   const [myId, setMyId] = useState<number>()
   const [numCoins, setNumCoins] = useState<number>()
   const [customRewards, setCustomRewards] = useState<CustomReward[]>([])
-  const [rewardRedeemed] = useState<boolean[]>([false]);
+  const [rewardRedeemed, setRewardRedeemed] = useState<boolean[]>([]);
 
   const appSkins = {
     jurassicJungle: {
@@ -90,7 +90,8 @@ export default function Rewards() {
         if (myId) {
           const request: ListCustomRewardsRequest = { child_id: myId };
           const result = await listCustomRewards(request)
-          setCustomRewards(result.custom_rewards)
+          setCustomRewards(result)
+          console.log("Got Custom rewards: ", result)
         }
       } catch (error) {
         console.error('Error: getting custom rewards', error)
@@ -118,17 +119,28 @@ export default function Rewards() {
       if (myId && reward_id) {
         const request: RedeemCustomRewardRequest = { child_id: myId, reward_id: reward_id }
         const result = await redeemCustomReward(request)
-        if (result.success) {
-          const request: SpendCoinsRequest = { coins_to_spend: cost }
-          const spendResult = await spendCoins(request)
-          console.log("Did we succeed spending coins: ", spendResult.message)
+        // if (result.success) {
+        //   const request: SpendCoinsRequest = { coins_to_spend: cost }
+        //   const spendResult = await spendCoins(request)
+        //   console.log("Did we succeed spending coins: ", spendResult.message)
+        // }
+
+        // Update the rewardRedeemed array to re render for ui change
+        setRewardRedeemed(prev => {
+          const newRedeemed = [...prev];
+          newRedeemed[reward_index] = true;
+          return newRedeemed;
+        });
+
+        // Update coin count
+        if (result.success && result.remaining_coins !== undefined) {
+          setNumCoins(result.remaining_coins);
         }
-        rewardRedeemed[reward_index] = true
 
         return result
       }
     } catch (error) {
-      console.log('Error redeeming custom reward: ', error)
+      console.log('Error redeeming custom reward: ', error, cost)
     }
   }
 
@@ -165,14 +177,14 @@ export default function Rewards() {
 
           <div className="card parentCard">
             <h2>Parent Incentives</h2>
-            {customRewards.map((customReward, index) => {
+            {customRewards?.map((option, index) => {
               return (
                 <Button
-                  onClick={() => redeemCustomRewardClicked(customReward.reward_id, index, customReward.coin_cost)}
+                  onClick={() => redeemCustomRewardClicked(option.reward_id, index, option.coin_cost)}
                   className="miniReward"
                   style={rewardRedeemed[index] ? { backgroundColor: 'green' } : {}}
                 >
-                  {customReward.description} : {customReward.coin_cost} coins
+                  {option.description} : {option.coin_cost} coins
                 </Button>
               )
             })}
