@@ -1,6 +1,7 @@
 # app/quiz_llm.py
 import json
 import os
+import random
 from typing import List, TypedDict
 
 from openai import OpenAI
@@ -186,6 +187,17 @@ def generate_quiz_for_book(
     
     for q in questions:
         q.setdefault("type", "multiple_choice")                     # ensure each question has a "type" field, defaulting to "multiple_choice"
+        
+        # shuffle the answer options so the correct answer isn't always in the same position
+        if q.get("options") and q.get("correct_answer"):
+            options = q["options"]
+            correct = q["correct_answer"]
+            
+            random.shuffle(options)
+            
+            # update the question with shuffled options
+            q["options"] = options
+            # correct_answer remains the same, since it is checking the str
 
     return questions
 
