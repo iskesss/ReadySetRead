@@ -14,32 +14,29 @@ import Rewards from './pages/Rewards.tsx'
 import Layout from "./components/layout";
 
 import StudentLandingPage from './pages/StudentLanding.tsx';
-import { StudentBooksProvider } from './components/StudentBooksContext.tsx';
 
 import ParentProgress from './pages/ParentProgress.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <StudentBooksProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/signup" element={<SignUpPage />} />
-          <Route element={<Layout userType="student" />}>
-            <Route path="/Rewards" element={<Rewards />} />
-            <Route path="/library" element={<LibraryPage />} />
-            <Route path="/studentLanding" element={<StudentLandingPage />} />
-            <Route path="/quiz" element={<QuizPage />} />
-            <Route path="/quizResults" element={<QuizResultsPage />} />
-          </Route>
-          <Route element={<Layout userType="parent" />}>
-            <Route path="/parentLanding" element={<ParentLanding />} />
-            <Route path="/ParentProgress" element={<ParentProgress />} />
-            <Route path="/ParentLibrary" element={<LibraryPage />} />
-          </Route>
-        </Routes >
-      </BrowserRouter >
-    </StudentBooksProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route element={<Layout userType="student" />}>
+          <Route path="/Rewards" element={<Rewards />} />
+          <Route path="/library" element={<LibraryPage />} />
+          <Route path="/studentLanding" element={<StudentLandingPage />} />
+          <Route path="/quiz" element={<QuizPage />} />
+          <Route path="/quizResults" element={<QuizResultsPage />} />
+        </Route>
+        <Route element={<Layout userType="parent" />}>
+          <Route path="/parentLanding" element={<ParentLanding />} />
+          <Route path="/ParentProgress" element={<ParentProgress />} />
+          <Route path="/ParentLibrary" element={<LibraryPage />} />
+        </Route>
+      </Routes >
+    </BrowserRouter >
   </StrictMode >,
 )
