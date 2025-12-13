@@ -224,7 +224,7 @@ export default function ParentProgress() {
               <h3>Added successfully!</h3>
             ) : (
               <>
-                <h3>Add Goal</h3>
+                <h3>Add Rewards</h3>
 
                 <form
                   onSubmit={async (e) => {
@@ -232,7 +232,7 @@ export default function ParentProgress() {
 
                     // Basic client-side validation
                     if (!goalText.trim()) {
-                      alert("Please enter a goal name.");
+                      alert("Please enter a reward name.");
                       return;
                     }
                     if (goalCoins === "" || Number(goalCoins) <= 0) {
