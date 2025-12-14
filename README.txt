@@ -1,6 +1,10 @@
-
-Welcome to the ReadySetRead Repository!
--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+      __...--~~~~~-._   _.-~~~~~--...__
+    //     ready     `V'    README     \\ 
+   //       set       |      .txt       \\ 
+  //__...--~~~~~~-._  |  _.-~~~~~~--...__\\ 
+ //__.....----~~~~._\ | /_.~~~~----.....__\\
+====================\\|//====================
+                    `---`
 
 We're a reading app for kids. After reading books they can take quizzes, earn coins, & buy rewards. And parents can track their progress.
 
